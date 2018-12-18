@@ -1,6 +1,6 @@
 <?php
 
-namespace StoreSpot\Pixel\Block;
+namespace StoreSpot\Personalization\Block;
 
 class Display extends \Magento\Framework\View\Element\Template
 {
@@ -23,7 +23,7 @@ class Display extends \Magento\Framework\View\Element\Template
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Catalog\Helper\Data $catalogHelper,
         \Magento\Checkout\Model\Session $_checkoutSession,
-        \StoreSpot\Pixel\Helper\Data $helperData,
+        \StoreSpot\Personalization\Helper\Data $helperData,
         \Magento\Search\Model\QueryFactory $queryFactory
     )
     {

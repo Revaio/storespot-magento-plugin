@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
-        <job name="storespot_create_feed" instance="StoreSpot\Pixel\Cron\FeedGenerator" method="execute">
+        <job name="storespot_create_feed" instance="StoreSpot\Personalization\Cron\FeedGenerator" method="execute">
             <schedule>* * * * *</schedule>
         </job>
     </group>

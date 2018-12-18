@@ -1,5 +1,5 @@
 <?php
-namespace StoreSpot\Pixel\Cron;
+namespace StoreSpot\Personalization\Cron;
 
 use \Psr\Log\LoggerInterface;
 

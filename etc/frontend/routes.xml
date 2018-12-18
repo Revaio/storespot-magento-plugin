@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
     <router id="standard">
         <route frontName="storespot" id="storespot">
-            <module name="StoreSpot_Pixel" />
+            <module name="StoreSpot_Personalization" />
         </route>
     </router>
 </config>

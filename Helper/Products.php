@@ -1,6 +1,6 @@
 <?php
 
-namespace StoreSpot\Pixel\Helper;
+namespace StoreSpot\Personalization\Helper;
 
 
 class Products extends \Magento\Framework\App\Helper\AbstractHelper

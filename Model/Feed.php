@@ -1,6 +1,6 @@
 <?php
 
-namespace StoreSpot\Pixel\Model;
+namespace StoreSpot\Personalization\Model;
 
 class Feed
 {
@@ -8,7 +8,7 @@ class Feed
     private $_storeManager;
 
     public function __construct(
-        \StoreSpot\Pixel\Helper\Products $helperProducts,
+        \StoreSpot\Personalization\Helper\Products $helperProducts,
         \Magento\Store\Model\StoreManagerInterface $storeManager
     )
     {

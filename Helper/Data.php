@@ -1,6 +1,6 @@
 <?php
 
-namespace StoreSpot\Pixel\Helper;
+namespace StoreSpot\Personalization\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Store\Model\ScopeInterface;

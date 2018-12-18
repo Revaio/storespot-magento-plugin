@@ -1,6 +1,6 @@
 <?php
 
-namespace StoreSpot\Pixel\Controller\Index;
+namespace StoreSpot\Personalization\Controller\Index;
 
 
 class Index extends \Magento\Framework\App\Action\Action
@@ -13,8 +13,8 @@ class Index extends \Magento\Framework\App\Action\Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Controller\Result\ForwardFactory $resultForwardFactory,
-        \StoreSpot\Pixel\Helper\Data $helper,
-        \StoreSpot\Pixel\Model\Feed $feed
+        \StoreSpot\Personalization\Helper\Data $helper,
+        \StoreSpot\Personalization\Model\Feed $feed
     )
     {
         $this->feed = $feed;

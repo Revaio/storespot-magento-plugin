@@ -2,9 +2,9 @@
 
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <referenceContainer name="after.body.start">
-        <block class="StoreSpot\Pixel\Block\Display"
+        <block class="StoreSpot\Personalization\Block\Display"
                name="storespot.pixel.product"
-               template="StoreSpot_Pixel::pixel.phtml"
+               template="StoreSpot_Personalization::pixel.phtml"
                after="-"
         />
     </referenceContainer>
