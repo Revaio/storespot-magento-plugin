@@ -5,42 +5,32 @@ namespace StoreSpot\Personalization\Helper;
 
 class Products extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    protected $_attributeSet;
-    protected $_collectionFactory;
-    protected $_productRepository;
-    public $_storeManager;
-    public $_productStatus;
-    public $_productVisibility;
-
-    protected $_searchCriteria;
-    protected $_filterGroup;
-    protected $_filterBuilder;
-    protected $_stockItemRepository;
+    private $_storeManager;
+    private $_productRepository;
+    private $_searchCriteria;
+    private $_filterGroup;
+    private $_filterBuilder;
+    private $_productStatus;
+    private $_stockItemRepository;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\Eav\Model\AttributeSetRepository $attributeSet,
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Catalog\Model\Product\Attribute\Source\Status $productStatus,
-        \Magento\Catalog\Model\Product\Visibility $productVisibility,
         \Magento\Catalog\Model\ProductRepository $productRepository,
-        \Magento\Framework\Api\SearchCriteriaInterface $criteria,
+        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria,
         \Magento\Framework\Api\Search\FilterGroup $filterGroup,
         \Magento\Framework\Api\FilterBuilder $filterBuilder,
-        \Magento\CatalogInventory\Model\Stock\StockitemRepository $stockitemRepository
+        \Magento\Catalog\Model\Product\Attribute\Source\Status $productStatus,
+        \Magento\CatalogInventory\Model\Stock\StockitemRepository $stockItemRepository
     )
     {
-        $this->_attributeSet = $attributeSet;
-        $this->_collectionFactory = $collectionFactory;
         $this->_storeManager = $storeManager;
-        $this->_productStatus = $productStatus;
-        $this->_productVisibility = $productVisibility;
         $this->_productRepository = $productRepository;
-        $this->_searchCriteria = $criteria;
+        $this->_searchCriteria = $searchCriteria;
         $this->_filterGroup = $filterGroup;
         $this->_filterBuilder = $filterBuilder;
-        $this->_stockItemRepository = $stockitemRepository;
+        $this->_productStatus = $productStatus;
+        $this->_stockItemRepository = $stockItemRepository;
 
         parent::__construct($context);
     }
@@ -48,20 +38,14 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     public function getProducts()
     {
         $this->_filterGroup->setFilters([
-//            $this->_filterBuilder
-//                ->setField('status')
-//                ->setConditionType('in')
-//                ->setValue($this->_productStatus->getVisibleStatusIds())
-//                ->create(),
-//            $this->_filterBuilder
-//                ->setField('visibility')
-//                ->setConditionType('in')
-//                ->setValue($this->_productVisibility->getVisibleInSiteIds())
-//                ->create(),
+            $this->_filterBuilder
+                ->setField('status')
+                ->setConditionType('in')
+                ->setValue($this->_productStatus->getVisibleStatusIds())
+                ->create(),
         ]);
 
         $this->_searchCriteria->setFilterGroups([$this->_filterGroup]);
-        $this->_searchCriteria->setPageSize(10);
         $products = $this->_productRepository->getList($this->_searchCriteria);
         $productItems = $products->getItems();
 
