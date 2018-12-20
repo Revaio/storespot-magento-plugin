@@ -4,28 +4,48 @@ namespace StoreSpot\Personalization\Model;
 
 class Feed
 {
-    private $_helperProducts;
+    private $_productsHelper;
+    private $_dataHelper;
     private $_storeManager;
+    private $_directoryList;
+    private $_io;
 
     public function __construct(
-        \StoreSpot\Personalization\Helper\Products $helperProducts,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \StoreSpot\Personalization\Helper\Products $productsHelper,
+        \StoreSpot\Personalization\Helper\Data $dataHelper,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
+        \Magento\Framework\Filesystem\Io\File $io
     )
     {
-        $this->_helperProducts = $helperProducts;
+        $this->_productsHelper = $productsHelper;
+        $this->_dataHelper = $dataHelper;
         $this->_storeManager = $storeManager;
+        $this->_directoryList = $directoryList;
+        $this->_io = $io;
     }
 
     public function createFeed()
     {
-        $feed = $this->createFeedHeader();
+        $dirPath = $this->_directoryList->getPath('media') . '/storespot/';
+        $fileName = "facebook-product-feed.xml";
+        $fileUrl =  $this->_storeManager->getStore()->getBaseUrl('media') . 'storespot/' . $fileName;
+
+        if (!file_exists($dirPath)) {
+            $this->_io->mkdir($dirPath);
+        }
+
+        $feed = $this->createFeedHeader($fileUrl);
         $feed .= $this->createFeedContent();
         $feed .= $this->createFeedFooter();
+
+        $this->_io->open(array('path'=>$dirPath));
+        $this->_io->write($fileName, $feed, 0666);
 
         return $feed;
     }
 
-    private function createFeedHeader()
+    private function createFeedHeader($url)
     {
         header("Content-Type: application/xml; charset=utf-8");
 
@@ -33,7 +53,7 @@ class Feed
         $header .= "<?xml version='1.0' encoding='UTF-8' ?>\n";
         $header .= "<feed xmlns='http://www.w3.org/2005/Atom' xmlns:g='http://base.google.com/ns/1.0'>\n";
         $header .= "  <title><![CDATA[" . $this->getStoreName() . " - Facebook Product Feed]]></title>\n";
-        $header .= "  <link rel='self' href='" . $this->getStoreURL() . "'/>\n";
+        $header .= "  <link rel='self' href='" . $url . "'/>\n";
         return $header;
     }
 
@@ -42,31 +62,29 @@ class Feed
         return $this->_storeManager->getStore()->getName();
     }
 
-    private function getStoreURL()
-    {
-        return $this->_storeManager->getStore()->getBaseUrl();
-    }
 
     private function createFeedContent()
     {
-        $products = $this->_helperProducts->getProducts();
+        $products = $this->_productsHelper->getProducts();
         $content = "";
+        $googleProductCategory = $this->_dataHelper->getGeneralConfig('google_product_category');
 
         foreach ($products as $product)
         {
             $content .= "<entry>";
-            $content .= $this->createProductXML($product);
+            $content .= $this->createProductXML($product, $googleProductCategory);
             $content .= "</entry>\n";
         }
 
         return $content;
     }
 
-    private function createProductXML($product)
+    private function createProductXML($product, $googleProductCategory)
     {
-        $description = $this->_helperProducts->getProductDescription($product);
-        $availability = $this->_helperProducts->getProductAvailability($product);
-        $image = $this->_helperProducts->getProductImage($product);
+        $description = $this->_productsHelper->getProductDescription($product);
+        $availability = $this->_productsHelper->getProductAvailability($product);
+        $image = $this->_productsHelper->getProductImage($product);
+
 
         $xml = "";
         $xml .= "<g:id>" . $product->getSku() . "</g:id>";
@@ -78,6 +96,7 @@ class Feed
         $xml .= "<g:price>" . $product->getPrice() . "</g:price>";
         $xml .= "<g:brand><![CDATA[" . $this->getStoreName() . "]]></g:brand>";
         $xml .= "<g:image_link>" . $image . "</g:image_link>";
+        $xml .= "<g:google_product_category>" . $googleProductCategory . "</g:google_product_category>";
 
         if ($product->getSpecialPrice()) {
             $xml .= "<g:sale_price>" . $product->getSpecialPrice() . "</g:sale_price>";

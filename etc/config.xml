@@ -6,6 +6,7 @@
                 <enable>1</enable>
                 <pixel_id>123</pixel_id>
                 <enabled>1</enabled>
+                <google_product_category>1</google_product_category>
             </general>
         </storespot>
     </default>

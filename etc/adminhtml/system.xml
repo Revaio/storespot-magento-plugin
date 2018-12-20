@@ -23,6 +23,10 @@
                     <label>Enable XML Feed?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="google_product_category" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Google Product Category</label>
+                    <comment>Your Google Product Category.</comment>
+                </field>
             </group>
         </section>
     </system>
