@@ -7,20 +7,37 @@ class Feed
     private $_helperProducts;
     private $_storeManager;
 
+    protected $_directoryList;
+    protected $_io;
+
     public function __construct(
         \StoreSpot\Personalization\Helper\Products $helperProducts,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
+        \Magento\Framework\Filesystem\Io\File $io
     )
     {
         $this->_helperProducts = $helperProducts;
         $this->_storeManager = $storeManager;
+        $this->_directoryList = $directoryList;
+        $this->_io = $io;
     }
 
     public function createFeed()
     {
+        $dirPath = $this->_directoryList->getPath('media') . '/storespot/';
+        $fileName = "facebook-product-feed.xml";
+
+        if (!file_exists($dirPath)) {
+            $this->_io->mkdir($dirPath);
+        }
+
         $feed = $this->createFeedHeader();
         $feed .= $this->createFeedContent();
         $feed .= $this->createFeedFooter();
+
+        $this->_io->open(array('path'=>$dirPath));
+        $this->_io->write($fileName, $feed, 0666);
 
         return $feed;
     }

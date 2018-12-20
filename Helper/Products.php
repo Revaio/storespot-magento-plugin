@@ -49,14 +49,19 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $this->_filterGroup->setFilters([
 //            $this->_filterBuilder
-//                ->setField('name')
-//                ->setConditionType('=')
-//                ->setValue('Strive Shoulder Pack')
+//                ->setField('status')
+//                ->setConditionType('in')
+//                ->setValue($this->_productStatus->getVisibleStatusIds())
+//                ->create(),
+//            $this->_filterBuilder
+//                ->setField('visibility')
+//                ->setConditionType('in')
+//                ->setValue($this->_productVisibility->getVisibleInSiteIds())
 //                ->create(),
         ]);
 
         $this->_searchCriteria->setFilterGroups([$this->_filterGroup]);
-        $this->_searchCriteria->setPageSize(1);
+        $this->_searchCriteria->setPageSize(10);
         $products = $this->_productRepository->getList($this->_searchCriteria);
         $productItems = $products->getItems();
 
