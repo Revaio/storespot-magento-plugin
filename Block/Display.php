@@ -16,20 +16,21 @@ class Display extends \Magento\Framework\View\Element\Template
      * Display constructor.
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Catalog\Helper\Data $catalogHelper
-     * @param \Magento\Checkout\Model\Session $_checkoutSession
-     * @param \StoreSpot\Pixel\Helper\Data $helperData
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \StoreSpot\Personalization\Helper\Data $helperData
+     * @param \Magento\Search\Model\QueryFactory $queryFactory
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Catalog\Helper\Data $catalogHelper,
-        \Magento\Checkout\Model\Session $_checkoutSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \StoreSpot\Personalization\Helper\Data $helperData,
         \Magento\Search\Model\QueryFactory $queryFactory
     )
     {
         $this->helperData = $helperData;
         $this->catalogHelper = $catalogHelper;
-        $this->checkoutSession = $_checkoutSession;
+        $this->checkoutSession = $checkoutSession;
         $this->queryFactory = $queryFactory;
         parent::__construct($context);
     }
