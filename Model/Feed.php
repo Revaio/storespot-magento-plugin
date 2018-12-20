@@ -4,20 +4,22 @@ namespace StoreSpot\Personalization\Model;
 
 class Feed
 {
-    private $_helperProducts;
+    private $_productsHelper;
+    private $_dataHelper;
     private $_storeManager;
-
-    protected $_directoryList;
-    protected $_io;
+    private $_directoryList;
+    private $_io;
 
     public function __construct(
-        \StoreSpot\Personalization\Helper\Products $helperProducts,
+        \StoreSpot\Personalization\Helper\Products $productsHelper,
+        \StoreSpot\Personalization\Helper\Data $dataHelper,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
         \Magento\Framework\Filesystem\Io\File $io
     )
     {
-        $this->_helperProducts = $helperProducts;
+        $this->_productsHelper = $productsHelper;
+        $this->_dataHelper = $dataHelper;
         $this->_storeManager = $storeManager;
         $this->_directoryList = $directoryList;
         $this->_io = $io;
@@ -66,24 +68,26 @@ class Feed
 
     private function createFeedContent()
     {
-        $products = $this->_helperProducts->getProducts();
+        $products = $this->_productsHelper->getProducts();
         $content = "";
+        $googleProductCategory = $this->_dataHelper->getGeneralConfig('google_product_category');
 
         foreach ($products as $product)
         {
             $content .= "<entry>";
-            $content .= $this->createProductXML($product);
+            $content .= $this->createProductXML($product, $googleProductCategory);
             $content .= "</entry>\n";
         }
 
         return $content;
     }
 
-    private function createProductXML($product)
+    private function createProductXML($product, $googleProductCategory)
     {
-        $description = $this->_helperProducts->getProductDescription($product);
-        $availability = $this->_helperProducts->getProductAvailability($product);
-        $image = $this->_helperProducts->getProductImage($product);
+        $description = $this->_productsHelper->getProductDescription($product);
+        $availability = $this->_productsHelper->getProductAvailability($product);
+        $image = $this->_productsHelper->getProductImage($product);
+
 
         $xml = "";
         $xml .= "<g:id>" . $product->getSku() . "</g:id>";
@@ -95,6 +99,7 @@ class Feed
         $xml .= "<g:price>" . $product->getPrice() . "</g:price>";
         $xml .= "<g:brand><![CDATA[" . $this->getStoreName() . "]]></g:brand>";
         $xml .= "<g:image_link>" . $image . "</g:image_link>";
+        $xml .= "<g:google_product_category>" . $googleProductCategory . "</g:google_product_category>";
 
         if ($product->getSpecialPrice()) {
             $xml .= "<g:sale_price>" . $product->getSpecialPrice() . "</g:sale_price>";
