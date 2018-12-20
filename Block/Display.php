@@ -5,11 +5,11 @@ namespace StoreSpot\Personalization\Block;
 class Display extends \Magento\Framework\View\Element\Template
 {
 
-    protected $helperData;
-    protected $catalogHelper;
-    private $_product;
-    private $_checkoutSession;
-    private $_queryFactory;
+    private $helperData;
+    private $catalogHelper;
+    private $product;
+    private $checkoutSession;
+    private $queryFactory;
 
 
     /**
@@ -29,8 +29,8 @@ class Display extends \Magento\Framework\View\Element\Template
     {
         $this->helperData = $helperData;
         $this->catalogHelper = $catalogHelper;
-        $this->_checkoutSession = $_checkoutSession;
-        $this->_queryFactory = $queryFactory;
+        $this->checkoutSession = $_checkoutSession;
+        $this->queryFactory = $queryFactory;
         parent::__construct($context);
     }
 
@@ -149,7 +149,7 @@ class Display extends \Magento\Framework\View\Element\Template
                 return $this->facebookEventCode('Purchase', $params);
 
             case 'catalogsearch_result_index':
-                $params['search_string'] = $this->_queryFactory->get()->getQueryText();
+                $params['search_string'] = $this->queryFactory->get()->getQueryText();
 
                 return $this->facebookEventCode('Search', $params);
 
@@ -165,10 +165,10 @@ class Display extends \Magento\Framework\View\Element\Template
      */
     private function getProduct()
     {
-        if(is_null($this->_product)) {
-            $this->_product = $this->catalogHelper->getProduct();
+        if(is_null($this->product)) {
+            $this->product = $this->catalogHelper->getProduct();
         }
-        return $this->_product;
+        return $this->product;
     }
 
     /**
@@ -177,14 +177,14 @@ class Display extends \Magento\Framework\View\Element\Template
      */
     private function getCartItems()
     {
-        $quote = $this->_checkoutSession->getQuote();
+        $quote = $this->checkoutSession->getQuote();
         $items = $quote->getAllItems();
         return $items;
     }
 
     private function getOrder()
     {
-        return $this->_checkoutSession->getLastRealOrder();
+        return $this->checkoutSession->getLastRealOrder();
     }
 
 }

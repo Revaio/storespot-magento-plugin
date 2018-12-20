@@ -5,13 +5,13 @@ namespace StoreSpot\Personalization\Helper;
 
 class Products extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    private $_storeManager;
-    private $_productRepository;
-    private $_searchCriteria;
-    private $_filterGroup;
-    private $_filterBuilder;
-    private $_productStatus;
-    private $_stockItemRepository;
+    private $storeManager;
+    private $productRepository;
+    private $searchCriteria;
+    private $filterGroup;
+    private $filterBuilder;
+    private $productStatus;
+    private $stockItemRepository;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -24,29 +24,29 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\CatalogInventory\Model\Stock\StockitemRepository $stockItemRepository
     )
     {
-        $this->_storeManager = $storeManager;
-        $this->_productRepository = $productRepository;
-        $this->_searchCriteria = $searchCriteria;
-        $this->_filterGroup = $filterGroup;
-        $this->_filterBuilder = $filterBuilder;
-        $this->_productStatus = $productStatus;
-        $this->_stockItemRepository = $stockItemRepository;
+        $this->storeManager = $storeManager;
+        $this->productRepository = $productRepository;
+        $this->searchCriteria = $searchCriteria;
+        $this->filterGroup = $filterGroup;
+        $this->filterBuilder = $filterBuilder;
+        $this->productStatus = $productStatus;
+        $this->stockItemRepository = $stockItemRepository;
 
         parent::__construct($context);
     }
 
     public function getProducts()
     {
-        $this->_filterGroup->setFilters([
-            $this->_filterBuilder
+        $this->filterGroup->setFilters([
+            $this->filterBuilder
                 ->setField('status')
                 ->setConditionType('in')
-                ->setValue($this->_productStatus->getVisibleStatusIds())
+                ->setValue($this->productStatus->getVisibleStatusIds())
                 ->create(),
         ]);
 
-        $this->_searchCriteria->setFilterGroups([$this->_filterGroup]);
-        $products = $this->_productRepository->getList($this->_searchCriteria);
+        $this->searchCriteria->setFilterGroups([$this->filterGroup]);
+        $products = $this->productRepository->getList($this->searchCriteria);
         $productItems = $products->getItems();
 
         return $productItems;
@@ -54,7 +54,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getProduct($productId)
     {
-        return $this->_productRepository->getById($productId);
+        return $this->productRepository->getById($productId);
     }
 
     public function getProductDescription($product)
@@ -72,7 +72,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getProductAvailability($product)
     {
-        $stockItem = $this->_stockItemRepository->get($product->getId());
+        $stockItem = $this->stockItemRepository->get($product->getId());
 
         if ($stockItem->getIsInStock()) {
             return 'in stock';
@@ -83,7 +83,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getProductImage($product)
     {
-       $url = $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA, true) . 'catalog/product' . $product->getImage();
+       $url = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA, true) . 'catalog/product' . $product->getImage();
        return $url;
     }
 }
