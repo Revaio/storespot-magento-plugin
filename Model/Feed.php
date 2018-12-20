@@ -29,12 +29,13 @@ class Feed
     {
         $dirPath = $this->_directoryList->getPath('media') . '/storespot/';
         $fileName = "facebook-product-feed.xml";
+        $fileUrl =  $this->_storeManager->getStore()->getBaseUrl('media') . 'storespot/' . $fileName;
 
         if (!file_exists($dirPath)) {
             $this->_io->mkdir($dirPath);
         }
 
-        $feed = $this->createFeedHeader();
+        $feed = $this->createFeedHeader($fileUrl);
         $feed .= $this->createFeedContent();
         $feed .= $this->createFeedFooter();
 
@@ -44,7 +45,7 @@ class Feed
         return $feed;
     }
 
-    private function createFeedHeader()
+    private function createFeedHeader($url)
     {
         header("Content-Type: application/xml; charset=utf-8");
 
@@ -52,7 +53,7 @@ class Feed
         $header .= "<?xml version='1.0' encoding='UTF-8' ?>\n";
         $header .= "<feed xmlns='http://www.w3.org/2005/Atom' xmlns:g='http://base.google.com/ns/1.0'>\n";
         $header .= "  <title><![CDATA[" . $this->getStoreName() . " - Facebook Product Feed]]></title>\n";
-        $header .= "  <link rel='self' href='" . $this->getStoreURL() . "'/>\n";
+        $header .= "  <link rel='self' href='" . $url . "'/>\n";
         return $header;
     }
 
@@ -61,10 +62,6 @@ class Feed
         return $this->_storeManager->getStore()->getName();
     }
 
-    private function getStoreURL()
-    {
-        return $this->_storeManager->getStore()->getBaseUrl();
-    }
 
     private function createFeedContent()
     {
