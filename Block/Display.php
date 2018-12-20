@@ -89,7 +89,6 @@ class Display extends \Magento\Framework\View\Element\Template
     public function getEventCode()
     {
         $action = $this->getActionName();
-        echo $action;
 
         $params = array();
         switch ($action) {
@@ -107,10 +106,6 @@ class Display extends \Magento\Framework\View\Element\Template
                 $p1 = $this->facebookEventCode('ViewContent', $params);
                 $p2 = $this->addToCartClickCode($params);
                 return $p1 . $p2;
-
-            case 'catalog_category_view':
-                echo $action;
-                break;
 
             case 'checkout_index_index':
             case 'onepagecheckout_index_index':
@@ -156,6 +151,9 @@ class Display extends \Magento\Framework\View\Element\Template
 
             case 'catalogsearch_advanced_result':
                 return $this->facebookEventCode('Search', $params);
+
+            default:
+                return null;
         }
     }
 
