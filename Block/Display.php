@@ -11,6 +11,8 @@ class Display extends \Magento\Framework\View\Element\Template
     private $checkoutSession;
     private $queryFactory;
 
+    private $coreSession;
+
 
     /**
      * Display constructor.
@@ -25,13 +27,15 @@ class Display extends \Magento\Framework\View\Element\Template
         \Magento\Catalog\Helper\Data $catalogHelper,
         \Magento\Checkout\Model\Session $checkoutSession,
         \StoreSpot\Personalization\Helper\Data $helperData,
-        \Magento\Search\Model\QueryFactory $queryFactory
+        \Magento\Search\Model\QueryFactory $queryFactory,
+        \Magento\Framework\Session\SessionManagerInterface $coreSession
     )
     {
         $this->helperData = $helperData;
         $this->catalogHelper = $catalogHelper;
         $this->checkoutSession = $checkoutSession;
         $this->queryFactory = $queryFactory;
+        $this->coreSession = $coreSession;
         parent::__construct($context);
     }
 
@@ -106,6 +110,9 @@ class Display extends \Magento\Framework\View\Element\Template
                 $p1 = $this->facebookEventCode('ViewContent', $params);
                 $p2 = $this->addToCartClickCode($params);
                 return $p1 . $p2;
+
+            case 'checkout_cart_index':
+                echo 'Jaja';
 
             case 'checkout_index_index':
             case 'onepagecheckout_index_index':
@@ -184,6 +191,16 @@ class Display extends \Magento\Framework\View\Element\Template
     private function getOrder()
     {
         return $this->checkoutSession->getLastRealOrder();
+    }
+
+    public function getSessionData($key, $remove=false)
+    {
+        return $this->coreSession->getData($key, $remove);
+    }
+
+    public function unsetAddToCart()
+    {
+        $this->coreSession->unsAddToCart();
     }
 
 }

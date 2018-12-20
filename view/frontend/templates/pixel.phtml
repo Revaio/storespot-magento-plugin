@@ -13,6 +13,10 @@
     fbq('init', '<?php echo $pixel_id ?>');
     fbq('track', 'PageView');
     <?php echo $event_code ?>
+    <?php if($block->getSessionData('AddToCart')) : ?>
+        alert("LOL");
+        <?php $block->unsetAddToCart(); ?>
+    <?php endif; ?>
 </script>
 
 <noscript>
