@@ -28,8 +28,10 @@ class StoreSpotSettings implements ApiInterface {
         $feed_enabled = $this->helperData->getGeneralConfig('enabled');
         $product_category = $this->helperData->getGeneralConfig('google_product_category');
 
+        $cron = $this->helperData->getCronConfig('next_execution');
+
         $output = [[
-            'cronjob'   => true,
+            'cronjob'   => $cron,
             'settings'  => [
               'pixel_id'          => $pixel_id,
               'product_feed'      => (bool) $feed_enabled,

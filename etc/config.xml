@@ -8,6 +8,10 @@
                 <enabled>1</enabled>
                 <google_product_category>1</google_product_category>
             </general>
+            <cron>
+                <last_execution>null</last_execution>
+                <next_execution>null</next_execution>
+            </cron>
         </storespot>
     </default>
 </config>
