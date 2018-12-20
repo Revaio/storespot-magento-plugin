@@ -1,0 +1,8 @@
+<integrations>
+    <integration name="StoreSpotIntegration">
+        <integration_name>StoreSpot Personalization user</integration_name>
+        <email>info@storespot.io</email>
+        <endpoint_url>https://connect.storespot.io/magento2/auth/</endpoint_url>
+        <identity_link_url>https://connect.storespot.io/magento2/login/</identity_link_url>
+    </integration>
+</integrations>

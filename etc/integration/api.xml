@@ -1,16 +1,16 @@
 <integrations>
     <integration name="StoreSpotIntegration">
-        <endpoint_url>https://connect.storespot.io/magento2/auth/</endpoint_url>
         <resources>
-            <!-- To grant permission to Magento_Log::online, its parent Magento_Customer::customer needs to be declared as well-->
-            <resource name="Magento_Customer::customer" />
-            <resource name="Magento_Log::online" />
-            <!-- To grant permission to Magento_Sales::reorder, all its parent resources need to be declared-->
-            <resource name="Magento_Sales::sales" />
-            <resource name="Magento_Sales::sales_operation" />
-            <resource name="Magento_Sales::sales_order" />
-            <resource name="Magento_Sales::actions" />
-            <resource name="Magento_Sales::reorder" />
+            <!-- Catalog resources -->
+            <resource name="Magento_Catalog::catalog" />
+            <resource name="Magento_Catalog::catalog_inventory" />
+            <resource name="Magento_Catalog::products" />
+            <resource name="Magento_Catalog::categories" />
+            <!-- Currency options -->
+            <resource name="Magento_Backend::stores" />
+            <resource name="Magento_Backend::stores_settings" />
+            <resource name="Magento_Config::config" />
+            <resource name="Magento_Config::currency" />
         </resources>
     </integration>
 </integrations>
