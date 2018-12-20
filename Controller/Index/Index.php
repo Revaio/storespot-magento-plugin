@@ -5,10 +5,10 @@ namespace StoreSpot\Personalization\Controller\Index;
 
 class Index extends \Magento\Framework\App\Action\Action
 {
-    protected $feed;
+    private $feed;
     private $helper;
     private $resultForward;
-    protected $resultForwardFactory;
+    private $resultForwardFactory;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,

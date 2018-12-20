@@ -4,11 +4,11 @@ namespace StoreSpot\Personalization\Model;
 
 class Feed
 {
-    private $_productsHelper;
-    private $_dataHelper;
-    private $_storeManager;
-    private $_directoryList;
-    private $_io;
+    private $productsHelper;
+    private $dataHelper;
+    private $storeManager;
+    private $directoryList;
+    private $io;
 
     public function __construct(
         \StoreSpot\Personalization\Helper\Products $productsHelper,
@@ -18,29 +18,29 @@ class Feed
         \Magento\Framework\Filesystem\Io\File $io
     )
     {
-        $this->_productsHelper = $productsHelper;
-        $this->_dataHelper = $dataHelper;
-        $this->_storeManager = $storeManager;
-        $this->_directoryList = $directoryList;
-        $this->_io = $io;
+        $this->productsHelper = $productsHelper;
+        $this->dataHelper = $dataHelper;
+        $this->storeManager = $storeManager;
+        $this->directoryList = $directoryList;
+        $this->io = $io;
     }
 
     public function createFeed()
     {
-        $dirPath = $this->_directoryList->getPath('media') . '/storespot/';
+        $dirPath = $this->directoryList->getPath('media') . '/storespot/';
         $fileName = "facebook-product-feed.xml";
-        $fileUrl =  $this->_storeManager->getStore()->getBaseUrl('media') . 'storespot/' . $fileName;
+        $fileUrl =  $this->storeManager->getStore()->getBaseUrl('media') . 'storespot/' . $fileName;
 
         if (!file_exists($dirPath)) {
-            $this->_io->mkdir($dirPath);
+            $this->io->mkdir($dirPath);
         }
 
         $feed = $this->createFeedHeader($fileUrl);
         $feed .= $this->createFeedContent();
         $feed .= $this->createFeedFooter();
 
-        $this->_io->open(array('path'=>$dirPath));
-        $this->_io->write($fileName, $feed, 0666);
+        $this->io->open(array('path'=>$dirPath));
+        $this->io->write($fileName, $feed, 0666);
 
         return $feed;
     }
@@ -59,15 +59,15 @@ class Feed
 
     private function getStoreName()
     {
-        return $this->_storeManager->getStore()->getName();
+        return $this->storeManager->getStore()->getName();
     }
 
 
     private function createFeedContent()
     {
-        $products = $this->_productsHelper->getProducts();
+        $products = $this->productsHelper->getProducts();
         $content = "";
-        $googleProductCategory = $this->_dataHelper->getGeneralConfig('google_product_category');
+        $googleProductCategory = $this->dataHelper->getGeneralConfig('google_product_category');
 
         foreach ($products as $product)
         {
@@ -81,9 +81,9 @@ class Feed
 
     private function createProductXML($product, $googleProductCategory)
     {
-        $description = $this->_productsHelper->getProductDescription($product);
-        $availability = $this->_productsHelper->getProductAvailability($product);
-        $image = $this->_productsHelper->getProductImage($product);
+        $description = $this->productsHelper->getProductDescription($product);
+        $availability = $this->productsHelper->getProductAvailability($product);
+        $image = $this->productsHelper->getProductImage($product);
 
 
         $xml = "";

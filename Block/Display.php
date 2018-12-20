@@ -5,32 +5,33 @@ namespace StoreSpot\Personalization\Block;
 class Display extends \Magento\Framework\View\Element\Template
 {
 
-    protected $helperData;
-    protected $catalogHelper;
-    private $_product;
-    private $_checkoutSession;
-    private $_queryFactory;
+    private $helperData;
+    private $catalogHelper;
+    private $product;
+    private $checkoutSession;
+    private $queryFactory;
 
 
     /**
      * Display constructor.
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Catalog\Helper\Data $catalogHelper
-     * @param \Magento\Checkout\Model\Session $_checkoutSession
-     * @param \StoreSpot\Pixel\Helper\Data $helperData
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \StoreSpot\Personalization\Helper\Data $helperData
+     * @param \Magento\Search\Model\QueryFactory $queryFactory
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Catalog\Helper\Data $catalogHelper,
-        \Magento\Checkout\Model\Session $_checkoutSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \StoreSpot\Personalization\Helper\Data $helperData,
         \Magento\Search\Model\QueryFactory $queryFactory
     )
     {
         $this->helperData = $helperData;
         $this->catalogHelper = $catalogHelper;
-        $this->_checkoutSession = $_checkoutSession;
-        $this->_queryFactory = $queryFactory;
+        $this->checkoutSession = $checkoutSession;
+        $this->queryFactory = $queryFactory;
         parent::__construct($context);
     }
 
@@ -88,7 +89,6 @@ class Display extends \Magento\Framework\View\Element\Template
     public function getEventCode()
     {
         $action = $this->getActionName();
-        echo $action;
 
         $params = array();
         switch ($action) {
@@ -106,10 +106,6 @@ class Display extends \Magento\Framework\View\Element\Template
                 $p1 = $this->facebookEventCode('ViewContent', $params);
                 $p2 = $this->addToCartClickCode($params);
                 return $p1 . $p2;
-
-            case 'catalog_category_view':
-                echo $action;
-                break;
 
             case 'checkout_index_index':
             case 'onepagecheckout_index_index':
@@ -149,12 +145,15 @@ class Display extends \Magento\Framework\View\Element\Template
                 return $this->facebookEventCode('Purchase', $params);
 
             case 'catalogsearch_result_index':
-                $params['search_string'] = $this->_queryFactory->get()->getQueryText();
+                $params['search_string'] = $this->queryFactory->get()->getQueryText();
 
                 return $this->facebookEventCode('Search', $params);
 
             case 'catalogsearch_advanced_result':
                 return $this->facebookEventCode('Search', $params);
+
+            default:
+                return null;
         }
     }
 
@@ -165,10 +164,10 @@ class Display extends \Magento\Framework\View\Element\Template
      */
     private function getProduct()
     {
-        if(is_null($this->_product)) {
-            $this->_product = $this->catalogHelper->getProduct();
+        if(is_null($this->product)) {
+            $this->product = $this->catalogHelper->getProduct();
         }
-        return $this->_product;
+        return $this->product;
     }
 
     /**
@@ -177,14 +176,14 @@ class Display extends \Magento\Framework\View\Element\Template
      */
     private function getCartItems()
     {
-        $quote = $this->_checkoutSession->getQuote();
+        $quote = $this->checkoutSession->getQuote();
         $items = $quote->getAllItems();
         return $items;
     }
 
     private function getOrder()
     {
-        return $this->_checkoutSession->getLastRealOrder();
+        return $this->checkoutSession->getLastRealOrder();
     }
 
 }
