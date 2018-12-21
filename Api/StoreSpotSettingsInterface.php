@@ -9,4 +9,5 @@ interface StoreSpotSettingsInterface {
      * @return boolean
      */
     public function getSettings();
+	public function setSettings();
 }

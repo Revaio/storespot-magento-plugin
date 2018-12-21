@@ -6,36 +6,64 @@ use StoreSpot\Personalization\Api\StoreSpotSettingsInterface as ApiInterface;
 
 class StoreSpotSettings implements ApiInterface {
 
-    protected $helperData;
+	protected $helperData;
 
-    /**
-     * @param \StoreSpot\Personalization\Helper\Data $helperData
-     */
-    public function __construct(
-        \StoreSpot\Personalization\Helper\Data $helperData
-    ) {
-        $this->helperData = $helperData;
-    }
 
-    /**
-     * Returns the StoreSpot settings.
-     *
-     * @api
-     * @return object
-     */
-    public function getSettings() {
-        $pixel_id = $this->helperData->getGeneralConfig('pixel_id');
-        $feed_enabled = $this->helperData->getGeneralConfig('enabled');
-        $product_category = $this->helperData->getGeneralConfig('google_product_category');
+	public function __construct(Data $helperData)
+	{
+		$this->helperData = $helperData;
+	}
 
-        $output = [[
-            'settings'  => [
-              'pixel_id'          => $pixel_id,
-              'product_feed'      => (bool) $feed_enabled,
-              'product_category'  => $product_category,
-            ]
-        ]];
+	private function getPixelId()
+	{
+		return $this->helperData->getGeneralConfig('pixel_id');
+	}
 
-        return $output;
-    }
+	private function setPixelId($pixel_id)
+	{
+		return $this->helperData->setGeneralConfig('pixel_id', $pixel_id);
+	}
+
+	private function getFeedEnabled()
+	{
+		return (bool) $this->helperData->getGeneralConfig('enabled');
+	}
+
+	private function setFeedEnabled($enabled)
+	{
+		return $this->helperData->setGeneralConfig('enabled', $enabled);
+	}
+
+	private function getProductCategory()
+	{
+		return $this->helperData->getGeneralConfig('google_product_category');
+	}
+
+	private function setProductCategory($category)
+	{
+		return $this->helperData->setGeneralConfig('google_product_category', $category);
+	}
+
+
+	public function getSettings() {
+		$pixel_id = $this->getPixelId();
+		$feed_enabled = $this->getFeedEnabled();
+		$product_category = $this->getProductCategory();
+
+		$output = [[
+			'settings' => [
+			  'pixel_id'			=> $pixel_id,
+			  'product_feed'		=> $feed_enabled,
+			  'product_category'	=> $product_category,
+			]
+		]];
+
+		return $output;
+	}
+
+
+	public function setSettings()
+	{
+		return true;
+	}
 }
