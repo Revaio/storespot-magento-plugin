@@ -4,15 +4,15 @@
 	<route url="/V1/storespot/settings" method="GET">
 		<service class="StoreSpot\Personalization\Api\StoreSpotSettingsInterface" method="getSettings"/>
 		<resources>
-			<resource ref="anonymous"/>
+			<resource ref="Magento_Config::config"/>
 		</resources>
 	</route>
 
 	<!-- Post StoreSpot Settings -->
 	<route url="/V1/storespot/settings" method="POST">
-		<service class="StoreSpot\Personalization\Api\StoreSpotSettingsInterface" method="setSettings"/>
-				<resources>
-					<resource ref="anonymous"/>
-				</resources>
+		<service class="StoreSpot\Personalization\Api\StoreSpotSettingsInterface" method="setSettings" />
+		<resources>
+			<resource ref="Magento_Config::config"/>
+		</resources>
 	</route>
 </routes>
