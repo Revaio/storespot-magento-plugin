@@ -17,8 +17,8 @@ class CartObserver implements ObserverInterface
 
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        error_log("test");
+        $this->coreSession->start();
         $this->coreSession->setAddToCart(true);
-        echo 'Event';
+        return $this;
     }
 }

@@ -21,6 +21,7 @@ class Display extends \Magento\Framework\View\Element\Template
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \StoreSpot\Personalization\Helper\Data $helperData
      * @param \Magento\Search\Model\QueryFactory $queryFactory
+     * @param \Magento\Framework\Session\SessionManagerInterface $coreSession
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
@@ -193,14 +194,16 @@ class Display extends \Magento\Framework\View\Element\Template
         return $this->checkoutSession->getLastRealOrder();
     }
 
-    public function getSessionData($key, $remove=false)
+    public function getAddToCart()
     {
-        return $this->coreSession->getData($key, $remove);
+        $this->coreSession->start();
+        $data = $this->coreSession->getAddToCart();
+        return $data;
     }
 
     public function unsetAddToCart()
     {
+        $this->coreSession->start();
         $this->coreSession->unsAddToCart();
     }
-
 }

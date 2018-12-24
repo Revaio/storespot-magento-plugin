@@ -1,6 +1,7 @@
 <?php
     $pixel_id = $block->getPixelId();
     $event_code = $block->getEventCode();
+    $add_to_cart = $block->getAddToCart();
 ?>
 
 <!-- StoreSpot Facebook Integration Begin --->
@@ -13,9 +14,9 @@
     fbq('init', '<?php echo $pixel_id ?>');
     fbq('track', 'PageView');
     <?php echo $event_code ?>
-    <?php if($block->getSessionData('AddToCart')) : ?>
-        alert("LOL");
-        <?php $block->unsetAddToCart(); ?>
+    <?php if ($add_to_cart) : ?>
+        fbq('track', 'AddToCart');
+        <?php $block->unsetAddToCart() ?>
     <?php endif; ?>
 </script>
 
