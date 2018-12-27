@@ -19,6 +19,8 @@ class CartObserver implements ObserverInterface
     {
         $this->coreSession->start();
         $this->coreSession->setAddToCart(true);
+        error_log(print_r(get_class_methods($observer->getEvent()), true));
+        error_log($observer->getEventName());
         return $this;
     }
 }
