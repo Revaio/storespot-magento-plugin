@@ -115,9 +115,16 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     {
         if ($product->getTypeId() == 'bundle') {
             $price = $product->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue();
+        } elseif ($product->getTypeId() == 'grouped') {
+            $children = $product->getTypeInstance()->getAssociatedProducts($product);
+            $price = INF;
+            foreach ($children as $child) {
+                $price = min($price, $child->getFinalPrice());
+            }
         } else {
             $price = $product->getFinalPrice();
         }
+
         $final = $this->catalogHelper->getTaxPrice(
             $product,
             $price,
