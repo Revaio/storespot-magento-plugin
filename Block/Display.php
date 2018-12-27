@@ -39,6 +39,7 @@ class Display extends \Magento\Framework\View\Element\Template
         parent::__construct($context);
     }
 
+
     /**
      * Returns action of current page
      * @return mixed
@@ -47,6 +48,7 @@ class Display extends \Magento\Framework\View\Element\Template
     {
         return $this->getRequest()->getFullActionName();
     }
+
 
     /**
      * Returns Facebook Pixel 'fbq' tracking code
@@ -59,6 +61,7 @@ class Display extends \Magento\Framework\View\Element\Template
     {
         return sprintf("fbq('%s', '%s', %s)", $method, $event, json_encode( $parameters, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT ) );
     }
+
 
     /**
      * Returns Add to Cart JQuery
@@ -76,6 +79,7 @@ class Display extends \Magento\Framework\View\Element\Template
         ", $this->facebookEventCode('AddToCart', $params));
     }
 
+
     /**
      * Return ID of pixel
      * @return mixed
@@ -84,6 +88,7 @@ class Display extends \Magento\Framework\View\Element\Template
     {
         return $this->dataHelper->getGeneralConfig('pixel_id');
     }
+
 
     /**
      * Returns Facebook Pixel event code if necessary
@@ -173,6 +178,7 @@ class Display extends \Magento\Framework\View\Element\Template
         return $this->product;
     }
 
+
     /**
      * Returns items in cart
      * @return array
@@ -184,6 +190,11 @@ class Display extends \Magento\Framework\View\Element\Template
         return $items;
     }
 
+
+    /**
+     * Returns last order
+     * @return \Magento\Sales\Model\Order
+     */
     private function getOrder()
     {
         return $this->checkoutSession->getLastRealOrder();
