@@ -95,11 +95,10 @@ class Display extends \Magento\Framework\View\Element\Template
             case 'catalog_product_view':
                 $product = $this->getProduct();
                 $type = $product->getTypeId();
-                if ($type !== 'simple') { return null; } // TODO: Momenteel enkel Simple Products
 
                 $params['value'] = $product->getFinalPrice();
                 $params['content_name'] = $product->getName();
-                $params['content_type'] = 'product'; // Want enkel simple products
+                $params['content_type'] = ($type == 'configurable' ? 'product_group' : 'product');
                 $params['content_ids'] = json_encode(array($product->getSku()));
                 $params['currency'] = $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
 
