@@ -12,6 +12,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     private $filterBuilder;
     private $productStatus;
     private $stockItemRepository;
+    private $configurableProductType;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -21,7 +22,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Api\Search\FilterGroup $filterGroup,
         \Magento\Framework\Api\FilterBuilder $filterBuilder,
         \Magento\Catalog\Model\Product\Attribute\Source\Status $productStatus,
-        \Magento\CatalogInventory\Model\Stock\StockitemRepository $stockItemRepository
+        \Magento\CatalogInventory\Model\Stock\StockitemRepository $stockItemRepository,
+        \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableProductType
     )
     {
         $this->storeManager = $storeManager;
@@ -31,6 +33,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->filterBuilder = $filterBuilder;
         $this->productStatus = $productStatus;
         $this->stockItemRepository = $stockItemRepository;
+        $this->configurableProductType = $configurableProductType;
 
         parent::__construct($context);
     }
@@ -85,5 +88,14 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     {
        $url = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA, true) . 'catalog/product' . $product->getImage();
        return $url;
+    }
+
+    public function getParentProduct($product)
+    {
+        $parent = $this->configurableProductType->getParentIdsByChild($product->getId());
+        if ($parent) {
+            return $this->getProduct($parent[0])->getSku();
+        }
+        return null;
     }
 }
