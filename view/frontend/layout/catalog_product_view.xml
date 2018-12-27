@@ -6,6 +6,7 @@
                name="storespot.pixel.product"
                template="StoreSpot_Personalization::pixel.phtml"
                after="-"
+               ifconfig="storespot/general/pixel_enabled"
         />
     </referenceContainer>
 </page>
