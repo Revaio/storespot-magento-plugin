@@ -84,7 +84,7 @@ class Feed
         $description = $this->productsHelper->getProductDescription($product);
         $availability = $this->productsHelper->getProductAvailability($product);
         $image = $this->productsHelper->getProductImage($product);
-
+        $parent = $this->productsHelper->getParentProduct($product);
 
         $xml = "";
         $xml .= "<g:id>" . $product->getSku() . "</g:id>";
@@ -108,6 +108,10 @@ class Feed
 
         if ($product->getSpecialToDate()) {
             $xml .= "<g:sale_price_end_date>" . $product->getSpecialToDate() . "</g:sale_price_end_date>";
+        }
+
+        if ($parent) {
+            $xml .= "<g:item_group_id>" . $parent . "</g:item_group_id>";
         }
 
         return $xml;
