@@ -81,6 +81,7 @@ class Feed
 
     private function createProductXML($product, $googleProductCategory)
     {
+        $title = ucwords(strtolower($product->getName()));
         $description = $this->productsHelper->getProductDescription($product);
         $availability = $this->productsHelper->getProductAvailability($product);
         $image = $this->productsHelper->getProductImage($product);
@@ -91,7 +92,7 @@ class Feed
 
         $xml = "";
         $xml .= "<g:id>" . $product->getSku() . "</g:id>";
-        $xml .= "<g:title><![CDATA[" . $product->getName() . "]]></g:title>";
+        $xml .= "<g:title><![CDATA[" . $title . "]]></g:title>";
         $xml .= "<g:description><![CDATA[" . $description . "]]></g:description>";
         $xml .= "<g:availability>" . $availability . "</g:availability>";
         $xml .= "<g:condition>new</g:condition>";
