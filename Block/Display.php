@@ -5,7 +5,8 @@ namespace StoreSpot\Personalization\Block;
 class Display extends \Magento\Framework\View\Element\Template
 {
 
-    private $helperData;
+    private $dataHelper;
+    private $productsHelper;
     private $catalogHelper;
     private $product;
     private $checkoutSession;
@@ -17,21 +18,24 @@ class Display extends \Magento\Framework\View\Element\Template
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Catalog\Helper\Data $catalogHelper
      * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \StoreSpot\Personalization\Helper\Data $helperData
+     * @param \StoreSpot\Personalization\Helper\Data $dataHelper
+     * @param \StoreSpot\Personalization\Helper\Products $productsHelper
      * @param \Magento\Search\Model\QueryFactory $queryFactory
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Catalog\Helper\Data $catalogHelper,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \StoreSpot\Personalization\Helper\Data $helperData,
+        \StoreSpot\Personalization\Helper\Data $dataHelper,
+        \StoreSpot\Personalization\Helper\Products $productsHelper,
         \Magento\Search\Model\QueryFactory $queryFactory
     )
     {
-        $this->helperData = $helperData;
+        $this->dataHelper = $dataHelper;
         $this->catalogHelper = $catalogHelper;
         $this->checkoutSession = $checkoutSession;
         $this->queryFactory = $queryFactory;
+        $this->productsHelper = $productsHelper;
         parent::__construct($context);
     }
 
@@ -78,7 +82,7 @@ class Display extends \Magento\Framework\View\Element\Template
      */
     public function getPixelId()
     {
-        return $this->helperData->getGeneralConfig('pixel_id');
+        return $this->dataHelper->getGeneralConfig('pixel_id');
     }
 
     /**
@@ -96,7 +100,7 @@ class Display extends \Magento\Framework\View\Element\Template
                 $product = $this->getProduct();
                 $type = $product->getTypeId();
 
-                $params['value'] = $product->getFinalPrice();
+                $params['value'] = $this->productsHelper->getProductPrice($product);
                 $params['content_name'] = $product->getName();
                 $params['content_type'] = ($type == 'configurable' ? 'product_group' : 'product');
                 $params['content_ids'] = json_encode(array($product->getSku()));
@@ -115,7 +119,7 @@ class Display extends \Magento\Framework\View\Element\Template
                     $content = array();
                     $content['id'] = $item->getSku();
                     $content['quantity'] = intval($item->getQty());
-                    $content['item_price'] = round($item->getPrice(), 2);
+                    $content['item_price'] = $this->productsHelper->getProductPrice($item);
 
                     $contents[] = $content;
                 }
@@ -132,7 +136,7 @@ class Display extends \Magento\Framework\View\Element\Template
                     $content = array();
                     $content['id'] = $item->getSku();
                     $content['quantity'] = intval($item->getQtyOrdered());
-                    $content['item_price'] = round($item->getPriceInclTax(), 2);
+                    $content['item_price'] = $this->productsHelper->getProductPrice($item);
 
                     $contents[] = $content;
                 }
