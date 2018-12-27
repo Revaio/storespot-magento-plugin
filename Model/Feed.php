@@ -93,13 +93,13 @@ class Feed
         $xml .= "<g:availability>" . $availability . "</g:availability>";
         $xml .= "<g:condition>new</g:condition>";
         $xml .= "<g:link>" . $product->getProductUrl() . "</g:link>";
-        $xml .= "<g:price>" . $product->getPrice() . "</g:price>";
+        $xml .= "<g:price>" . round($product->getPrice(), 2) . "</g:price>";
         $xml .= "<g:brand><![CDATA[" . $this->getStoreName() . "]]></g:brand>";
         $xml .= "<g:image_link>" . $image . "</g:image_link>";
         $xml .= "<g:google_product_category>" . $googleProductCategory . "</g:google_product_category>";
 
         if ($product->getSpecialPrice()) {
-            $xml .= "<g:sale_price>" . $product->getSpecialPrice() . "</g:sale_price>";
+            $xml .= "<g:sale_price>" . round($product->getSpecialPrice(), 2) . "</g:sale_price>";
         }
 
         if ($product->getSpecialFromDate()) {

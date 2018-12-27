@@ -116,7 +116,7 @@ class Display extends \Magento\Framework\View\Element\Template
                     $content = array();
                     $content['id'] = $item->getSku();
                     $content['quantity'] = intval($item->getQty());
-                    $content['item_price'] = $item->getPrice();
+                    $content['item_price'] = round($item->getPrice(), 2);
 
                     $contents[] = $content;
                 }
@@ -133,14 +133,14 @@ class Display extends \Magento\Framework\View\Element\Template
                     $content = array();
                     $content['id'] = $item->getSku();
                     $content['quantity'] = intval($item->getQtyOrdered());
-                    $content['item_price'] = $item->getPriceInclTax();
+                    $content['item_price'] = round($item->getPriceInclTax(), 2);
 
                     $contents[] = $content;
                 }
                 $params['currency'] = $order->getOrderCurrencyCode();
                 $params['content_type'] = 'product';
                 $params['contents'] = json_encode($contents);
-                $params['value'] = $order->getGrandTotal();
+                $params['value'] = round($order->getGrandTotal(), 2);
 
                 return $this->facebookEventCode('Purchase', $params);
 
