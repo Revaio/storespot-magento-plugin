@@ -85,6 +85,9 @@ class Feed
         $availability = $this->productsHelper->getProductAvailability($product);
         $image = $this->productsHelper->getProductImage($product);
         $parent = $this->productsHelper->getParentProduct($product);
+        $specialPrice = $product->getSpecialPrice();
+        $specialFromDate = $product->getSpecialFromDate();
+        $specialToDate = $product->getSpecialToDate();
 
         $xml = "";
         $xml .= "<g:id>" . $product->getSku() . "</g:id>";
@@ -98,16 +101,16 @@ class Feed
         $xml .= "<g:image_link>" . $image . "</g:image_link>";
         $xml .= "<g:google_product_category>" . $googleProductCategory . "</g:google_product_category>";
 
-        if ($product->getSpecialPrice()) {
-            $xml .= "<g:sale_price>" . round($product->getSpecialPrice(), 2) . "</g:sale_price>";
+        if ($specialPrice) {
+            $xml .= "<g:sale_price>" . round($specialPrice, 2) . "</g:sale_price>";
         }
 
-        if ($product->getSpecialFromDate()) {
-            $xml .= "<g:sale_price_start_date>" . $product->getSpecialFromDate() . "</g:sale_price_start_date>";
+        if ($specialFromDate) {
+            $xml .= "<g:sale_price_start_date>" . $specialFromDate . "</g:sale_price_start_date>";
         }
 
-        if ($product->getSpecialToDate()) {
-            $xml .= "<g:sale_price_end_date>" . $product->getSpecialToDate() . "</g:sale_price_end_date>";
+        if ($specialToDate) {
+            $xml .= "<g:sale_price_end_date>" . $specialToDate . "</g:sale_price_end_date>";
         }
 
         if ($parent) {
