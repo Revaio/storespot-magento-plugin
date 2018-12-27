@@ -2,19 +2,21 @@
 namespace StoreSpot\Personalization\Cron;
 
 class FeedGenerator {
-    protected $feed;
+    private $feed;
+    private $dataHelper;
     
     public function __construct(
-        \StoreSpot\Personalization\Model\Feed $feed
+        \StoreSpot\Personalization\Model\Feed $feed,
+        \StoreSpot\Personalization\Helper\Data $dataHelper
     )
     {
         $this->feed = $feed;
+        $this->dataHelper = $dataHelper;
     }
 
     public function execute() {
-        error_log('New feed generation');
-        $this->feed->createFeed();
-        error_log('Done with the feed');
+        if ($this->dataHelper->getGeneralConfig('feed_enabled')) {
+            $this->feed->createFeed();
+        }
     }
-
 }
