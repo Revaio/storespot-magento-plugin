@@ -3,9 +3,9 @@
     <default>
         <storespot>
             <general>
-                <enable>1</enable>
+                <pixel_enabled>1</pixel_enabled>
+                <feed_enabled>1</feed_enabled>
                 <pixel_id>123</pixel_id>
-                <enabled>1</enabled>
                 <google_product_category>1</google_product_category>
             </general>
         </storespot>
