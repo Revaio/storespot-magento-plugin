@@ -113,7 +113,11 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getProductPrice($product)
     {
-        $price = $product->getFinalPrice();
+        if ($product->getTypeId() == 'bundle') {
+            $price = $product->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue();
+        } else {
+            $price = $product->getFinalPrice();
+        }
         $final = $this->catalogHelper->getTaxPrice(
             $product,
             $price,
