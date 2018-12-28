@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+	<!-- Get StoreSpot Settings -->
+	<route url="/V1/storespot/settings" method="GET">
+		<service class="StoreSpot\Personalization\Api\StoreSpotSettingsInterface" method="getSettings"/>
+		<resources>
+			<resource ref="Magento_Config::config"/>
+		</resources>
+	</route>
+
+	<!-- Post StoreSpot Settings -->
+	<route url="/V1/storespot/settings" method="POST">
+		<service class="StoreSpot\Personalization\Api\StoreSpotSettingsInterface" method="setSettings" />
+		<resources>
+			<resource ref="Magento_Config::config"/>
+		</resources>
+	</route>
+</routes>
