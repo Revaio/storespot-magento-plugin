@@ -1,17 +1,20 @@
 <?php
 namespace StoreSpot\Personalization\Model;
-
-use StoreSpot\Personalization\Helper\Data;
 use StoreSpot\Personalization\Api\StoreSpotSettingsInterface as ApiInterface;
+
 
 class StoreSpotSettings implements ApiInterface {
 
 	protected $helperData;
+	protected $cacheTypeList;
 
-
-	public function __construct(Data $helperData)
+	public function __construct(
+		\Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+		\StoreSpot\Personalization\Helper\Data $helperData
+	)
 	{
 		$this->helperData = $helperData;
+		$this->cacheTypeList = $cacheTypeList;
 	}
 
 	private function getPixelId()
@@ -89,10 +92,17 @@ class StoreSpotSettings implements ApiInterface {
 	 * @param boolean $pixel_enabled Enable pixel
 	 * @param boolean $feed_enabled Enable product feed
 	 * @param string $product_category Google product category
-	 * @return boolean
+	 * @return boolean $updated
 	 */
 	public function setSettings( $pixel_id, $pixel_enabled, $feed_enabled, $product_category )
 	{
-		return true;
+		$this->setPixelId( $pixel_id );
+		$this->setPixelEnabled( $pixel_enabled );
+		$this->setFeedEnabled( $feed_enabled );
+		$this->setProductCategory( $product_category );
+		$this->cacheTypeList->cleanType(
+			\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER
+		);
+		return [['updated' => true]];
 	}
 }
