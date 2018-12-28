@@ -15,4 +15,12 @@
 			<resource ref="Magento_Config::config"/>
 		</resources>
 	</route>
+
+	<!-- Get Store Info -->
+	<route url="/V1/storespot/store_info" method="GET">
+		<service class="StoreSpot\Personalization\Api\StoreInfoInterface" method="getStoreInfo"/>
+		<resources>
+			<resource ref="Magento_Config::config"/>
+		</resources>
+	</route>
 </routes>
