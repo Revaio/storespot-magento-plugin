@@ -1,5 +1,5 @@
 <integrations>
-    <integration name="StoreSpotIntegration">
+    <integration name="StoreSpot Personalization user">
         <resources>
             <!-- Catalog resources -->
             <resource name="Magento_Catalog::catalog" />

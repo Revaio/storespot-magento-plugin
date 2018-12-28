@@ -30,6 +30,6 @@
 
      public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
      {
-         $this->integrationManager->processIntegrationConfig(['StoreSpotIntegration']);
+         $this->integrationManager->processIntegrationConfig(['StoreSpot Personalization user']);
      }
  }
