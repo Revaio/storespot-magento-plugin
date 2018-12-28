@@ -16,9 +16,9 @@ interface StoreSpotSettingsInterface {
 	 * @api
 	 * @param string $pixel_id Facebook pixel id
 	 * @param boolean $pixel_enabled Enable pixel
-	 * @param boolean $product_feed_enabled Enable product feed
+	 * @param boolean $feed_enabled Enable product feed
 	 * @param string $product_category Google product category
 	 * @return boolean
 	 */
-	public function setSettings( $pixel_id, $pixel_enabled, $product_feed_enabled, $product_category );
+	public function setSettings( $pixel_id, $pixel_enabled, $feed_enabled, $product_category );
 }

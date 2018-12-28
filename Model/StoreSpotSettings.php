@@ -24,14 +24,24 @@ class StoreSpotSettings implements ApiInterface {
 		return $this->helperData->setGeneralConfig('pixel_id', $pixel_id);
 	}
 
-	private function getFeedEnabled()
+	private function getPixelEnabled()
 	{
-		return (bool) $this->helperData->getGeneralConfig('enabled');
+		return (bool) $this->helperData->getGeneralConfig('pixel_enabled');
 	}
 
-	private function setFeedEnabled($enabled)
+	private function setPixelEnabled($pixel_enabled)
 	{
-		return $this->helperData->setGeneralConfig('enabled', $enabled);
+		return $this->helperData->setGeneralConfig('pixel_enabled', $pixel_enabled);
+	}
+
+	private function getFeedEnabled()
+	{
+		return (bool) $this->helperData->getGeneralConfig('feed_enabled');
+	}
+
+	private function setFeedEnabled($feed_enabled)
+	{
+		return $this->helperData->setGeneralConfig('feed_enabled', $feed_enabled);
 	}
 
 	private function getProductCategory()
@@ -56,15 +66,15 @@ class StoreSpotSettings implements ApiInterface {
 	 */
 	public function getSettings() {
 		$pixel_id = $this->getPixelId();
-		$feed_enabled = $this->getFeedEnabled();
+		$feed_enabled = $this->getPixelEnabled();
 		$pixel_enabled = $this->getFeedEnabled();
 		$product_category = $this->getProductCategory();
 
 		$output = [[
-			'pixel_id'				=> $pixel_id,
-			'pixel_enabled'			=> $pixel_enabled,
-			'product_feed_enabled'	=> $feed_enabled,
-			'product_category'		=> $product_category,
+			'pixel_id'			=> $pixel_id,
+			'pixel_enabled'		=> $pixel_enabled,
+			'feed_enabled'		=> $feed_enabled,
+			'product_category'	=> $product_category,
 		]];
 
 		return $output;
@@ -77,11 +87,11 @@ class StoreSpotSettings implements ApiInterface {
 	 * @api
 	 * @param string $pixel_id Facebook pixel id
 	 * @param boolean $pixel_enabled Enable pixel
-	 * @param boolean $product_feed_enabled Enable product feed
+	 * @param boolean $feed_enabled Enable product feed
 	 * @param string $product_category Google product category
 	 * @return boolean
 	 */
-	public function setSettings( $pixel_id, $pixel_enabled, $product_feed_enabled, $product_category )
+	public function setSettings( $pixel_id, $pixel_enabled, $feed_enabled, $product_category )
 	{
 		return true;
 	}
