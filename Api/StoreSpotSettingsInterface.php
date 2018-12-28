@@ -6,7 +6,7 @@ interface StoreSpotSettingsInterface {
      * Returns the StoreSpot settings.
      *
      * @api
-     * @return boolean
+     * @return boolean $updated
      */
     public function getSettings();
 

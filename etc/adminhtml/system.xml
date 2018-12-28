@@ -4,7 +4,7 @@
         <tab id="storespot" translate="label" sortOrder="10">
             <label>StoreSpot</label>
         </tab>
-        <section id="storespot" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+        <section id="storespot" translate="label" sortOrder="130" showInDefault="1" showInWebsite="0" showInStore="0">
             <class>separator-top</class>
             <label>StoreSpot</label>
             <tab>storespot</tab>

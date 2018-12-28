@@ -1,14 +1,8 @@
 <?php
-
 namespace StoreSpot\Personalization\Helper;
 
-use Magento\Framework\App\Config\Storage\WriterInterface;
-use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\Helper\Context;
-use Magento\Store\Model\ScopeInterface;
 
-
-class Data extends AbstractHelper
+class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
 	const XML_PATH_STORESPOT = 'storespot/';
 
@@ -16,19 +10,18 @@ class Data extends AbstractHelper
 	protected $scope;
 
 	public function __construct(
-		Context $context,
-		array $data = [],
-		WriterInterface $configWriter
+		\Magento\Framework\App\Helper\Context $context,
+		\Magento\Framework\App\Config\Storage\WriterInterface $configWriter
 	)
 	{
-		parent::__construct($context, $data);
+		parent::__construct($context);
 		$this->configWriter = $configWriter;
-		$this->scope = ScopeInterface::SCOPE_STORE;
+		$this->scope = 'default';
 	}
 
-	public function getConfigValue($field, $storeId = null)
+	public function getConfigValue($field)
 	{
-		return $this->scopeConfig->getValue($field, $this->scope, $storeId);
+		return $this->scopeConfig->getValue($field, $this->scope);
 	}
 
 	public function setConfigValue($field, $value)
@@ -37,11 +30,10 @@ class Data extends AbstractHelper
 	}
 
 	// General settings
-	public function getGeneralConfig($field, $storeId = null)
+	public function getGeneralConfig($field)
 	{
 		return $this->getConfigValue(
-			self::XML_PATH_STORESPOT . 'general/' . $field,
-			$storeId
+			self::XML_PATH_STORESPOT . 'general/' . $field
 		);
 	}
 
