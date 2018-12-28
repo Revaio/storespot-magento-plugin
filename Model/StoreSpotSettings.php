@@ -45,24 +45,43 @@ class StoreSpotSettings implements ApiInterface {
 	}
 
 
+	/**
+	 * Returns the StoreSpot settings.
+	 *
+	 * @api
+	 * @return string $pixel_id Facebook pixel id
+	 * @return boolean $pixel_enabled Enable pixel
+	 * @return boolean $product_feed_enabled Enable product feed
+	 * @return string $product_category Google product category
+	 */
 	public function getSettings() {
 		$pixel_id = $this->getPixelId();
 		$feed_enabled = $this->getFeedEnabled();
+		$pixel_enabled = $this->getFeedEnabled();
 		$product_category = $this->getProductCategory();
 
 		$output = [[
-			'settings' => [
-			  'pixel_id'			=> $pixel_id,
-			  'product_feed'		=> $feed_enabled,
-			  'product_category'	=> $product_category,
-			]
+			'pixel_id'				=> $pixel_id,
+			'pixel_enabled'			=> $pixel_enabled,
+			'product_feed_enabled'	=> $feed_enabled,
+			'product_category'		=> $product_category,
 		]];
 
 		return $output;
 	}
 
 
-	public function setSettings()
+	/**
+	 * Sets the StoreSpot settings.
+	 *
+	 * @api
+	 * @param string $pixel_id Facebook pixel id
+	 * @param boolean $pixel_enabled Enable pixel
+	 * @param boolean $product_feed_enabled Enable product feed
+	 * @param string $product_category Google product category
+	 * @return boolean
+	 */
+	public function setSettings( $pixel_id, $pixel_enabled, $product_feed_enabled, $product_category )
 	{
 		return true;
 	}
