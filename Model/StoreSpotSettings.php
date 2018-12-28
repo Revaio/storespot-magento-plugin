@@ -103,6 +103,7 @@ class StoreSpotSettings implements ApiInterface {
 		$this->cacheTypeList->cleanType(
 			\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER
 		);
+		$this->cacheTypeList->cleanType('full_page');
 		return [['updated' => true]];
 	}
 }
