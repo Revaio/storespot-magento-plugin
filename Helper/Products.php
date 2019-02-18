@@ -76,9 +76,11 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     {
         if ($product->getShortDescription()) {
             $description = $product->getShortDescription();
-        } else {
+        } elseif ($product->getDescription()) {
             $description = $product->getDescription();
-        }
+        } else {
+			$description = $product->getName();
+		}
         $encode = mb_detect_encoding($description);
         $description = mb_convert_encoding($description, 'UTF-8', $encode);
         $description = strip_tags($description);
@@ -106,7 +108,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $parent = $this->configurableProductType->getParentIdsByChild($product->getId());
         if ($parent) {
-            return $this->getProduct($parent[0])->getSku();
+            return $this->getProduct($parent[0]);
         }
         return null;
     }

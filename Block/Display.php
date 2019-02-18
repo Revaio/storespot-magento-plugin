@@ -71,13 +71,33 @@ class Display extends \Magento\Framework\View\Element\Template
     private function addToCartClickCode($params)
     {
         return sprintf("
-        require(['jquery'], function($){
-            $('#product-addtocart-button').click(function() {
-                %s;
-            })
-        })
+
+require(['jquery'], function($){
+    $('#product-addtocart-button').click(function() {
+        %s;
+    })
+})
         ", $this->facebookEventCode('AddToCart', $params));
     }
+
+	/**
+     * Returns Add to Cart JQuery
+     * @param $params
+     * @return string
+     */
+    private function addToCartCategoryCode()
+    {
+        return "
+
+require(['jquery'], function($){
+    $('form[data-role=tocart-form]').submit(function() {
+        console.log'ok';
+    })
+})
+        ";
+    }
+
+
 
 
     /**
@@ -89,81 +109,89 @@ class Display extends \Magento\Framework\View\Element\Template
         return $this->dataHelper->getGeneralConfig('pixel_id');
     }
 
+	/**
+	 * Return ID of product
+	 * @return string
+	 */
+	public function getContentId($product)
+	{
+		return 'stsp_' . $product->getId();
+	}
+
 
     /**
      * Returns Facebook Pixel event code if necessary
      * @return string|null
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getEventCode()
-    {
-        $action = $this->getActionName();
+	public function getEventCode()
+	{
+		$action = $this->getActionName();
+		$params = array();
 
-        $params = array();
-        switch ($action) {
-            case 'catalog_product_view':
-                $product = $this->getProduct();
-                $type = $product->getTypeId();
+		switch ($action) {
+			case 'catalog_product_view':
+				$product = $this->getProduct();
+				$type = $product->getTypeId();
 
-                $params['value'] = $this->productsHelper->getProductPrice($product);
-                $params['content_name'] = $product->getName();
-                $params['content_type'] = ($type == 'configurable' ? 'product_group' : 'product');
-                $params['content_ids'] = json_encode(array($product->getSku()));
-                $params['currency'] = $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
+				$params['value'] = $this->productsHelper->getProductPrice($product);
+				$params['content_name'] = $product->getName();
+				$params['content_type'] = ($type == 'configurable' ? 'product_group' : 'product');
+				$params['content_ids'] = json_encode(array($this->getContentId( $product )));
+				$params['currency'] = $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
 
-                $p1 = $this->facebookEventCode('ViewContent', $params);
-                $p2 = $this->addToCartClickCode($params);
-                return $p1 . $p2;
+				$p1 = $this->facebookEventCode('ViewContent', $params);
+				$p2 = $this->addToCartClickCode($params);
+				return $p1 . $p2;
 
-            case 'checkout_index_index':
-            case 'onepagecheckout_index_index':
-            case 'onestepcheckout_index_index':
-                $items = $this->getCartItems();
-                $contents = array();
-                foreach ( $items as $item ) {
-                    $content = array();
-                    $content['id'] = $item->getSku();
-                    $content['quantity'] = intval($item->getQty());
-                    $content['item_price'] = $this->productsHelper->getProductPrice($item);
+			case 'checkout_index_index':
+			case 'onepagecheckout_index_index':
+			case 'onestepcheckout_index_index':
+				$items = $this->getCartItems();
+				$contents = array();
+				foreach ( $items as $item ) {
+					$content = array();
+					$content['id'] = $this->getContentId( $item );
+					$content['quantity'] = intval($item->getQty());
+					$content['item_price'] = $this->productsHelper->getProductPrice($item);
+					$contents[] = $content;
+				}
+				$params['contents'] = json_encode($contents);
+				$params['content_type'] = 'product';
+				return $this->facebookEventCode('InitiateCheckout', $params);
 
-                    $contents[] = $content;
-                }
-                $params['contents'] = json_encode($contents);
-                $params['content_type'] = 'product';
+			case 'checkout_onepage_success':
+				$order = $this->getOrder();
+				$items = $order->getAllVisibleItems();
+				$contents = array();
+				foreach ( $items as $item ) {
+					$content = array();
+					$content['id'] = $this->getContentId( $item );
+					$content['quantity'] = intval($item->getQtyOrdered());
+					$content['item_price'] = $this->productsHelper->getProductPrice($item);
+					$contents[] = $content;
+				}
+				$params['currency'] = $order->getOrderCurrencyCode();
+				$params['content_type'] = 'product';
+				$params['contents'] = json_encode($contents);
+				$params['value'] = round($order->getGrandTotal(), 2);
 
-                return $this->facebookEventCode('InitiateCheckout', $params);
+				return $this->facebookEventCode('Purchase', $params);
 
-            case 'checkout_onepage_success':
-                $order = $this->getOrder();
-                $items = $order->getAllVisibleItems();
-                $contents = array();
-                foreach ( $items as $item ) {
-                    $content = array();
-                    $content['id'] = $item->getSku();
-                    $content['quantity'] = intval($item->getQtyOrdered());
-                    $content['item_price'] = $this->productsHelper->getProductPrice($item);
+			case 'catalogsearch_result_index':
+				$params['search_string'] = $this->queryFactory->get()->getQueryText();
+				return $this->facebookEventCode('Search', $params);
 
-                    $contents[] = $content;
-                }
-                $params['currency'] = $order->getOrderCurrencyCode();
-                $params['content_type'] = 'product';
-                $params['contents'] = json_encode($contents);
-                $params['value'] = round($order->getGrandTotal(), 2);
+			case 'catalogsearch_advanced_result':
+				return $this->facebookEventCode('Search', $params);
 
-                return $this->facebookEventCode('Purchase', $params);
+			case 'catalog_category_view':
+				return $this->addToCartCategoryCode();
 
-            case 'catalogsearch_result_index':
-                $params['search_string'] = $this->queryFactory->get()->getQueryText();
-
-                return $this->facebookEventCode('Search', $params);
-
-            case 'catalogsearch_advanced_result':
-                return $this->facebookEventCode('Search', $params);
-
-            default:
-                return null;
-        }
-    }
+			default:
+				return null;
+		}
+	}
 
 
     /**

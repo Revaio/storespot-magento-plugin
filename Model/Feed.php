@@ -71,9 +71,7 @@ class Feed
 
         foreach ($products as $product)
         {
-            $content .= "<entry>";
             $content .= $this->createProductXML($product, $googleProductCategory);
-            $content .= "</entry>\n";
         }
 
         return $content;
@@ -81,42 +79,65 @@ class Feed
 
     private function createProductXML($product, $googleProductCategory)
     {
-        $title = ucwords(strtolower($product->getName()));
-        $description = $this->productsHelper->getProductDescription($product);
-        $availability = $this->productsHelper->getProductAvailability($product);
-        $image = $this->productsHelper->getProductImage($product);
-        $parent = $this->productsHelper->getParentProduct($product);
-        $specialPrice = $product->getSpecialPrice();
-        $specialFromDate = $product->getSpecialFromDate();
-        $specialToDate = $product->getSpecialToDate();
+		$parent = $this->productsHelper->getParentProduct($product);
+		if( ! $product->getImage() ) {
+			if( ! $parent )
+			{
+				return;
+			}
+			if( ! $parent->getImage() ) {
+				return;
+			}
+		}
 
-        $xml = "";
-        $xml .= "<g:id>" . $product->getSku() . "</g:id>";
-        $xml .= "<g:title><![CDATA[" . $title . "]]></g:title>";
+		$product_id		= $product->getId();
+		$feed_id 		= 'stsp_' . $product_id;
+		$currency		= $this->storeManager->getStore()->getCurrentCurrency()->getCode();
+
+		$group_id 		= $parent ? 'stsp_' . $parent->getId() : null;
+		$product_name	= ucwords(strtolower($product->getName()));
+		$product_price	= round($product->getPrice(), 2);
+		$description	= $this->productsHelper->getProductDescription($product);
+		$availability 	= $this->productsHelper->getProductAvailability($product);
+		$condition		= 'new';
+		$image_link		= $this->productsHelper->getProductImage($product);
+		$brand			= $this->getStoreName();
+		$link			= $product->getProductUrl();
+
+		$sale_price		= round($product->getSpecialPrice(), 2);
+		$on_sale		= $sale_price ===  $product_price;
+		$sale_from 		= $product->getSpecialFromDate();
+		$sale_to		= $product->getSpecialToDate();
+
+
+		$xml = "<entry>";
+		$xml .= "<g:id>" . $feed_id . "</g:id>";
+        $xml .= "<g:title><![CDATA[" . $product_name . "]]></g:title>";
         $xml .= "<g:description><![CDATA[" . $description . "]]></g:description>";
         $xml .= "<g:availability>" . $availability . "</g:availability>";
-        $xml .= "<g:condition>new</g:condition>";
-        $xml .= "<g:link>" . $product->getProductUrl() . "</g:link>";
-        $xml .= "<g:price>" . round($product->getPrice(), 2) . "</g:price>";
-        $xml .= "<g:brand><![CDATA[" . $this->getStoreName() . "]]></g:brand>";
-        $xml .= "<g:image_link>" . $image . "</g:image_link>";
+        $xml .= "<g:condition>" . $condition . "</g:condition>";
+        $xml .= "<g:link>" . $link . "</g:link>";
+        $xml .= "<g:price>" . $product_price . ' ' . $currency ."</g:price>";
+        $xml .= "<g:brand><![CDATA[" . $brand . "]]></g:brand>";
+        $xml .= "<g:image_link>" . $image_link . "</g:image_link>";
         $xml .= "<g:google_product_category>" . $googleProductCategory . "</g:google_product_category>";
 
-        if ($specialPrice) {
-            $xml .= "<g:sale_price>" . round($specialPrice, 2) . "</g:sale_price>";
+        if ($on_sale) {
+            $xml .= "<g:sale_price>" . $sale_price . ' ' . $currency . "</g:sale_price>";
         }
 
-        if ($specialFromDate) {
-            $xml .= "<g:sale_price_start_date>" . $specialFromDate . "</g:sale_price_start_date>";
+        if ($sale_from) {
+            $xml .= "<g:sale_price_start_date>" . $sale_from . "</g:sale_price_start_date>";
         }
 
-        if ($specialToDate) {
-            $xml .= "<g:sale_price_end_date>" . $specialToDate . "</g:sale_price_end_date>";
+        if ($sale_to) {
+            $xml .= "<g:sale_price_end_date>" . $sale_to . "</g:sale_price_end_date>";
         }
 
-        if ($parent) {
-            $xml .= "<g:item_group_id>" . $parent . "</g:item_group_id>";
+        if ($group_id) {
+            $xml .= "<g:item_group_id>" . $group_id . "</g:item_group_id>";
         }
+		$xml .= "</entry>";
 
         return $xml;
     }
