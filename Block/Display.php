@@ -11,6 +11,7 @@ class Display extends \Magento\Framework\View\Element\Template
     private $product;
     private $checkoutSession;
     private $queryFactory;
+    private $logger;
 
 
     /**
@@ -28,7 +29,8 @@ class Display extends \Magento\Framework\View\Element\Template
         \Magento\Checkout\Model\Session $checkoutSession,
         \StoreSpot\Personalization\Helper\Data $dataHelper,
         \StoreSpot\Personalization\Helper\Products $productsHelper,
-        \Magento\Search\Model\QueryFactory $queryFactory
+        \Magento\Search\Model\QueryFactory $queryFactory,
+		\Psr\Log\LoggerInterface $logger
     )
     {
         $this->dataHelper = $dataHelper;
@@ -36,6 +38,7 @@ class Display extends \Magento\Framework\View\Element\Template
         $this->checkoutSession = $checkoutSession;
         $this->queryFactory = $queryFactory;
         $this->productsHelper = $productsHelper;
+		$this->logger = $logger;
         parent::__construct($context);
     }
 
@@ -85,18 +88,20 @@ require(['jquery'], function($){
      * @param $params
      * @return string
      */
-    private function addToCartCategoryCode()
+    private function addToCartMultiple($products)
     {
-        return "
-
+		return sprintf("
 require(['jquery'], function($){
-    $('form[data-role=tocart-form]').submit(function() {
-        console.log'ok';
-    })
+	$('form[data-role=\"tocart-form\"]').submit(function() {
+		const products = %s;
+		const product = products[$(this).children('input[name=\"product\"]').val()];
+		if( product && product.content_type === 'product' ) {
+			fbq('track', 'AddToCart', product)
+		}
+	})
 })
-        ";
-    }
-
+", json_encode($products));
+	}
 
 
 
@@ -186,7 +191,18 @@ require(['jquery'], function($){
 				return $this->facebookEventCode('Search', $params);
 
 			case 'catalog_category_view':
-				return $this->addToCartCategoryCode();
+				$products = $this->getCategoryProducts();
+				$js_const = [];
+				foreach ( $products as $product ) {
+					$id = $product->getId();
+					$js_const[$id] = [
+						'value'			=> $this->productsHelper->getProductPrice($product),
+						'content_type'	=> ($product->getTypeId() == 'configurable' ? 'product_group' : 'product'),
+						'content_ids'	=> [$this->getContentId( $product )],
+						'currency'		=> $this->_storeManager->getStore()->getCurrentCurrency()->getCode()
+					];
+				}
+				return $this->addToCartMultiple($js_const);
 
 			default:
 				return null;
@@ -204,6 +220,14 @@ require(['jquery'], function($){
             $this->product = $this->catalogHelper->getProduct();
         }
         return $this->product;
+    }
+
+	/**
+     * Returns category
+     */
+    private function getCategoryProducts()
+    {
+        return $this->catalogHelper->getCategory()->getProductCollection()->addFinalPrice();
     }
 
 
