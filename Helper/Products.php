@@ -2,7 +2,6 @@
 
 namespace StoreSpot\Personalization\Helper;
 
-
 class Products extends \Magento\Framework\App\Helper\AbstractHelper
 {
     private $storeManager;
@@ -33,8 +32,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableProductType,
         \Magento\Catalog\Helper\Data $catalogHelper,
         \Magento\Tax\Model\Config $taxConfig
-    )
-    {
+    ) {
         $this->dataHelper = $dataHelper;
         $this->storeManager = $storeManager;
         $this->catalogHelper = $catalogHelper;
@@ -79,8 +77,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         } elseif ($product->getDescription()) {
             $description = $product->getDescription();
         } else {
-			$description = $product->getName();
-		}
+            $description = $product->getName();
+        }
         $encode = mb_detect_encoding($description);
         $description = mb_convert_encoding($description, 'UTF-8', $encode);
         $description = strip_tags($description);
@@ -100,8 +98,11 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getProductImage($product)
     {
-       $url = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA, true) . 'catalog/product' . $product->getImage();
-       return $url;
+        $url = $this->storeManager->getStore()->getBaseUrl(
+            \Magento\Framework\UrlInterface::URL_TYPE_MEDIA,
+            true
+        ) . 'catalog/product' . $product->getImage();
+        return $url;
     }
 
     public function getParentProduct($product)

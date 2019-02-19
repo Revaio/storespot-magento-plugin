@@ -1,7 +1,8 @@
 <?php
 namespace StoreSpot\Personalization\Api;
 
-interface StoreInfoInterface {
+interface StoreInfoInterface
+{
     /**
      * Returns default settings.
      *

@@ -6,30 +6,29 @@
  use Magento\Integration\Model\ConfigBasedIntegrationManager;
  use Magento\Framework\Setup\InstallDataInterface;
 
- class InstallData implements InstallDataInterface
- {
-     /**
-      * @var ConfigBasedIntegrationManager
-      */
+class InstallData implements InstallDataInterface
+{
+    /**
+     * @var ConfigBasedIntegrationManager
+     */
 
+    private $integrationManager;
 
-     private $integrationManager;
+    /**
+     * @param ConfigBasedIntegrationManager $integrationManager
+     */
 
-     /**
-      * @param ConfigBasedIntegrationManager $integrationManager
-      */
+    public function __construct(ConfigBasedIntegrationManager $integrationManager)
+    {
+        $this->integrationManager = $integrationManager;
+    }
 
-     public function __construct(ConfigBasedIntegrationManager $integrationManager)
-     {
-         $this->integrationManager = $integrationManager;
-     }
+    /**
+     * {@inheritdoc}
+     */
 
-     /**
-      * {@inheritdoc}
-      */
-
-     public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
-     {
-         $this->integrationManager->processIntegrationConfig(['StoreSpot Personalization user']);
-     }
- }
+    public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
+    {
+        $this->integrationManager->processIntegrationConfig(['StoreSpot Personalization user']);
+    }
+}

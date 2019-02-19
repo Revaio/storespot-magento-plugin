@@ -16,8 +16,7 @@ class Feed
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
         \Magento\Framework\Filesystem\Io\File $io
-    )
-    {
+    ) {
         $this->productsHelper = $productsHelper;
         $this->dataHelper = $dataHelper;
         $this->storeManager = $storeManager;
@@ -31,7 +30,7 @@ class Feed
         $fileName = "facebook-product-feed.xml";
         $fileUrl =  $this->storeManager->getStore()->getBaseUrl('media') . 'storespot/' . $fileName;
 
-        if (!file_exists($dirPath)) {
+        if (!$this->io->fileExists($dirPath, $onlyFile = false)) {
             $this->io->mkdir($dirPath);
         }
 
@@ -39,7 +38,7 @@ class Feed
         $feed .= $this->createFeedContent();
         $feed .= $this->createFeedFooter();
 
-        $this->io->open(array('path'=>$dirPath));
+        $this->io->open(['path'=>$dirPath]);
         $this->io->write($fileName, $feed, 0666);
 
         return $feed;
@@ -47,8 +46,6 @@ class Feed
 
     private function createFeedHeader($url)
     {
-        header("Content-Type: application/xml; charset=utf-8");
-
         $header  = "";
         $header .= "<?xml version='1.0' encoding='UTF-8' ?>\n";
         $header .= "<feed xmlns='http://www.w3.org/2005/Atom' xmlns:g='http://base.google.com/ns/1.0'>\n";
@@ -62,15 +59,13 @@ class Feed
         return $this->storeManager->getStore()->getName();
     }
 
-
     private function createFeedContent()
     {
         $products = $this->productsHelper->getProducts();
         $content = "";
         $googleProductCategory = $this->dataHelper->getGeneralConfig('google_product_category');
 
-        foreach ($products as $product)
-        {
+        foreach ($products as $product) {
             $content .= $this->createProductXML($product, $googleProductCategory);
         }
 
@@ -79,39 +74,37 @@ class Feed
 
     private function createProductXML($product, $googleProductCategory)
     {
-		$parent = $this->productsHelper->getParentProduct($product);
-		if( ! $product->getImage() ) {
-			if( ! $parent )
-			{
-				return;
-			}
-			if( ! $parent->getImage() ) {
-				return;
-			}
-		}
+        $parent = $this->productsHelper->getParentProduct($product);
+        if (! $product->getImage()) {
+            if (! $parent) {
+                return;
+            }
+            if (! $parent->getImage()) {
+                return;
+            }
+        }
 
-		$product_id		= $product->getId();
-		$feed_id 		= 'stsp_' . $product_id;
-		$currency		= $this->storeManager->getStore()->getCurrentCurrency()->getCode();
+        $product_id     = $product->getId();
+        $feed_id        = 'stsp_' . $product_id;
+        $currency       = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
 
-		$group_id 		= $parent ? 'stsp_' . $parent->getId() : null;
-		$product_name	= ucwords(strtolower($product->getName()));
-		$product_price	= round($product->getPrice(), 2);
-		$description	= $this->productsHelper->getProductDescription($product);
-		$availability 	= $this->productsHelper->getProductAvailability($product);
-		$condition		= 'new';
-		$image_link		= $this->productsHelper->getProductImage($product);
-		$brand			= $this->getStoreName();
-		$link			= $product->getProductUrl();
+        $group_id       = $parent ? 'stsp_' . $parent->getId() : null;
+        $product_name   = ucwords(strtolower($product->getName()));
+        $product_price  = round($product->getPrice(), 2);
+        $description    = $this->productsHelper->getProductDescription($product);
+        $availability   = $this->productsHelper->getProductAvailability($product);
+        $condition      = 'new';
+        $image_link     = $this->productsHelper->getProductImage($product);
+        $brand          = $this->getStoreName();
+        $link           = $product->getProductUrl();
 
-		$sale_price		= round($product->getSpecialPrice(), 2);
-		$on_sale		= $sale_price ===  $product_price;
-		$sale_from 		= $product->getSpecialFromDate();
-		$sale_to		= $product->getSpecialToDate();
+        $sale_price     = round($product->getSpecialPrice(), 2);
+        $on_sale        = $sale_price ===  $product_price;
+        $sale_from      = $product->getSpecialFromDate();
+        $sale_to        = $product->getSpecialToDate();
 
-
-		$xml = "<entry>";
-		$xml .= "<g:id>" . $feed_id . "</g:id>";
+        $xml = "<entry>";
+        $xml .= "<g:id>" . $feed_id . "</g:id>";
         $xml .= "<g:title><![CDATA[" . $product_name . "]]></g:title>";
         $xml .= "<g:description><![CDATA[" . $description . "]]></g:description>";
         $xml .= "<g:availability>" . $availability . "</g:availability>";
@@ -137,7 +130,7 @@ class Feed
         if ($group_id) {
             $xml .= "<g:item_group_id>" . $group_id . "</g:item_group_id>";
         }
-		$xml .= "</entry>";
+        $xml .= "</entry>";
 
         return $xml;
     }
