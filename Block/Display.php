@@ -100,17 +100,28 @@ class Display extends \Magento\Framework\View\Element\Template
         ];
 
         $p1 = $this->facebookEventCode('ViewContent', $params);
-        $p2 = $this->facebookEventCode('AddToCart', $params);
 
         return sprintf("%s
 
             require(['jquery'], function($){
-                $('#product-addtocart-button').click(function() {
-                    %s;
+                $('#product_addtocart_form').submit(function() {
+                    const qty = $(this).find('input[name=\"qty\"]').val();
+                    const val = %s * qty;
+                    fbq('track', 'AddToCart', {
+                        content_ids: ['stsp_%s'],
+                        content_type: 'product',
+                        value: val,
+                        currency: '%s'
+                    });
                 })
             })
 
-        ", $p1, $p2);
+        ",
+            $p1,
+            $this->productsHelper->getProductPrice($product),
+            $product->getId(),
+            $this->getCurrency()
+        );
     }
 
     /**
