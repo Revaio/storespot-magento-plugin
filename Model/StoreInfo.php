@@ -29,10 +29,12 @@ class StoreInfo implements ApiInterface
         $scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
         $currency = $this->storeManager->getStore()->getBaseCurrencyCode();
         $country = $this->scopeConfig->getValue('general/country/default', $scope);
+        $mediaUrl = $this->storeManager->getStore()->getBaseUrl('media');
 
         $output = [[
             'currency'  => $currency,
             'country'   => $country,
+			'media_url' => $mediaUrl,
         ]];
 
         return $output;
