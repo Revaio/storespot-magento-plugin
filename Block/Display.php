@@ -101,7 +101,8 @@ class Display extends \Magento\Framework\View\Element\Template
 
         $p1 = $this->facebookEventCode('ViewContent', $params);
 
-        return sprintf("%s
+        return sprintf(
+            "%s
 
             require(['jquery'], function($){
                 $('#product_addtocart_form').submit(function() {

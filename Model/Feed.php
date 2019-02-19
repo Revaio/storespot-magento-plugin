@@ -74,7 +74,7 @@ class Feed
 
     private function createProductXML($product, $googleProductCategory)
     {
-        if( $product->getTypeId() == 'configurable') {
+        if ($product->getTypeId() == 'configurable') {
             return;
         }
 

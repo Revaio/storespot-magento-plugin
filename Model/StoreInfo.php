@@ -34,7 +34,7 @@ class StoreInfo implements ApiInterface
         $output = [[
             'currency'  => $currency,
             'country'   => $country,
-			'media_url' => $mediaUrl,
+            'media_url' => $mediaUrl,
         ]];
 
         return $output;
