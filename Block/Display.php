@@ -52,9 +52,9 @@ class Display extends \Magento\Framework\View\Element\Template
      * Return feed ID of product
      * @return string
      */
-    public function getContentId($product)
+    public function getContentId($product_id)
     {
-        return 'stsp_' . $product->getId();
+        return 'stsp_' . $product_id;
     }
 
     /**
@@ -94,7 +94,7 @@ class Display extends \Magento\Framework\View\Element\Template
 
         $params = [
             'content_type'  => $type,
-            'content_ids'   => json_encode([$this->getContentId($product)]),
+            'content_ids'   => json_encode([$this->getContentId($product->getId())]),
             'value'         => $this->productsHelper->getProductPrice($product),
             'currency'      => $this->getCurrency()
         ];
@@ -102,13 +102,14 @@ class Display extends \Magento\Framework\View\Element\Template
         $p1 = $this->facebookEventCode('ViewContent', $params);
         $p2 = $this->facebookEventCode('AddToCart', $params);
 
-        return sprintf("
-            %s
+        return sprintf("%s
+
             require(['jquery'], function($){
                 $('#product-addtocart-button').click(function() {
                     %s;
                 })
             })
+
         ", $p1, $p2);
     }
 
@@ -124,15 +125,16 @@ class Display extends \Magento\Framework\View\Element\Template
         $contents = [];
         foreach ($items as $item) {
             $content = [];
-            $content['id'] = $this->getContentId($item);
+            $content['id'] = $this->getContentId($item->getProductId());
             $content['quantity'] = (int) $item->getQty();
-            $content['item_price'] = $this->productsHelper->getProductPrice($item);
+            $content['item_price'] = round($item->getPrice(), 2);
             $contents[] = $content;
         }
 
         $params = [
             'content_type'  => 'product',
-            'contents'      => json_encode($contents)
+            'contents'      => json_encode($contents),
+            'currency'      => $this->getCurrency()
         ];
 
         return $this->facebookEventCode('InitiateCheckout', $params);
@@ -149,9 +151,9 @@ class Display extends \Magento\Framework\View\Element\Template
         $contents = [];
         foreach ($items as $item) {
             $content = [];
-            $content['id'] = $this->getContentId($item);
+            $content['id'] = $this->getContentId($item->getProductId());
             $content['quantity'] = (int) $item->getQtyOrdered();
-            $content['item_price'] = $this->productsHelper->getProductPrice($item);
+            $content['item_price'] = round($item->getPrice(), 2);
             $contents[] = $content;
         }
 
@@ -180,11 +182,12 @@ class Display extends \Magento\Framework\View\Element\Template
             $product_list[$id] = [
                 'value'         => $this->productsHelper->getProductPrice($product),
                 'content_type'  => $type,
-                'content_ids'   => [$this->getContentId($product)],
+                'content_ids'   => [$this->getContentId($product->getId())],
                 'currency'      => $this->getCurrency()
             ];
         }
         return sprintf("
+
             require(['jquery'], function($){
                 $('form[data-role=\"tocart-form\"]').submit(function() {
                     const products = %s;
@@ -194,6 +197,7 @@ class Display extends \Magento\Framework\View\Element\Template
                     }
                 })
             })
+
         ", json_encode($product_list));
     }
 
@@ -204,6 +208,7 @@ class Display extends \Magento\Framework\View\Element\Template
     public function renderAddToCartButtonEvent()
     {
         return sprintf("
+
             require(['jquery'], function($){
                 try {
                     $('button.tocart[data-post]').click(function() {
@@ -222,6 +227,7 @@ class Display extends \Magento\Framework\View\Element\Template
                     return;
                 }
             })
+
         ", $this->getCurrency());
     }
 
@@ -258,29 +264,5 @@ class Display extends \Magento\Framework\View\Element\Template
             default:
                 return null;
         }
-    }
-
-    public function renderStoreSpotCode()
-    {
-        return "
-<script type='text/javascript'>
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-document,'script','https://connect.facebook.net/en_US/fbevents.js');
-
-fbq('init', '" . $this->getPixelId() . "');
-fbq('track', 'PageView');
-" . $this->getEventCode() . "
-" . $this->renderAddToCartButtonEvent() . "
-</script>
-
-<noscript>
-<img height='1' width='1' style='display:none' alt='fbpx'
-    src='https://www.facebook.com/tr?id=" . $this->getPixelId() . "&ev=PageView&noscript=1'
-/>
-</noscript>
-";
     }
 }

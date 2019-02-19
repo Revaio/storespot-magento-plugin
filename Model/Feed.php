@@ -74,6 +74,10 @@ class Feed
 
     private function createProductXML($product, $googleProductCategory)
     {
+        if( $product->getTypeId() == 'configurable') {
+            return;
+        }
+
         $parent = $this->productsHelper->getParentProduct($product);
         if (! $product->getImage()) {
             if (! $parent) {
