@@ -44,26 +44,4 @@ class StoreInfo implements ApiInterface
 
         return $output;
     }
-
-    /**
-     * Sets the StoreSpot settings.
-     *
-     * @api
-     * @param string $pixel_id Facebook pixel id
-     * @param boolean $pixel_enabled Enable pixel
-     * @param boolean $feed_enabled Enable product feed
-     * @param string $product_category Google product category
-     * @return boolean $updated
-     */
-    public function setSettings($pixel_id, $pixel_enabled, $feed_enabled, $product_category)
-    {
-        $this->setPixelId($pixel_id);
-        $this->setPixelEnabled($pixel_enabled);
-        $this->setFeedEnabled($feed_enabled);
-        $this->setProductCategory($product_category);
-        $this->cacheTypeList->cleanType(
-            \Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER
-        );
-        return [['updated' => true]];
-    }
 }

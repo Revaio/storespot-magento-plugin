@@ -4,9 +4,7 @@
 				<storespot>
 						<general>
 								<pixel_enabled>0</pixel_enabled>
-								<feed_enabled>0</feed_enabled>
 								<pixel_id></pixel_id>
-								<google_product_category></google_product_category>
 						</general>
 				</storespot>
 		</default>
