@@ -47,7 +47,7 @@ class StoreSpotSettings implements ApiInterface
     public function getSettings()
     {
         $pixel_id = $this->getPixelId();
-        $feed_enabled = $this->getPixelEnabled();
+        $pixel_enabled = $this->getPixelEnabled();
 
         $output = [[
             'pixel_id'          => $pixel_id,
