@@ -13,6 +13,7 @@ class Display extends \Magento\Framework\View\Element\Template
     private $product;
     private $checkoutSession;
     private $queryFactory;
+    private $listHelper;
 
     /**
      * Display constructor.
@@ -26,6 +27,7 @@ class Display extends \Magento\Framework\View\Element\Template
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Catalog\Helper\Data $catalogHelper,
+        \Magento\Catalog\Helper\Product\ProductList $listHelper,
         \StoreSpot\Personalization\Helper\Data $dataHelper,
         \StoreSpot\Personalization\Helper\Products $productsHelper,
         \Magento\Search\Model\QueryFactory $queryFactory,
@@ -36,6 +38,7 @@ class Display extends \Magento\Framework\View\Element\Template
         $this->queryFactory = $queryFactory;
         $this->productsHelper = $productsHelper;
         $this->checkoutSession = $checkoutSession;
+        $this->listHelper = $listHelper;
         parent::__construct($context);
     }
 
@@ -83,6 +86,31 @@ class Display extends \Magento\Framework\View\Element\Template
         );
     }
 
+    private function getProductVariations($product)
+    {
+        $used_attributes = [];
+        foreach ($product->getTypeInstance()->getUsedProductAttributes($product) as $attr) {
+            $used_attributes[$attr->getId()] = $attr->getAttributeCode();
+        }
+
+        $options = [];
+        $variations = $product->getTypeInstance()->getUsedProducts($product);
+        foreach ($variations as $option) {
+            $variation = [
+                'id'    => $this->getContentId($option->getId()),
+                'price' => $this->productsHelper->getProductPrice($option),
+            ];
+
+            foreach ($used_attributes as $id => $value) {
+                $variation[$id] = $option->getData($value);
+            }
+
+            $options[$option->getId()] = $variation;
+        }
+
+        return $options;
+    }
+
     /**
      * Render view product event
      * @return string
@@ -90,39 +118,64 @@ class Display extends \Magento\Framework\View\Element\Template
     private function renderViewContentEvent()
     {
         $product = $this->catalogHelper->getProduct();
-        $type = $product->getTypeId() == 'configurable' ? 'product_group' : 'product';
+        $product_id = $product->getId();
+        $product_type = $product->getTypeId();
+        $product_price = $this->productsHelper->getProductPrice($product);
 
-        $params = [
-            'content_type'  => $type,
-            'content_ids'   => json_encode([$this->getContentId($product->getId())]),
-            'value'         => $this->productsHelper->getProductPrice($product),
-            'currency'      => $this->getCurrency()
-        ];
+        $type = 'product';
+        if( $product_type == 'configurable' ) {
+            $type = 'product_group';
+            $options = $this->getProductVariations( $product );
 
-        $p1 = $this->facebookEventCode('ViewContent', $params);
-
-        return sprintf(
-            "%s
-
+            $add_to_cart = sprintf("
             require(['jquery'], function($){
                 $('#product_addtocart_form').submit(function() {
+                    let products = %s;
+                    let item = $(this).find('input[name=\"selected_configurable_option\"]').val();
                     const qty = $(this).find('input[name=\"qty\"]').val();
-                    const val = %s * qty;
+                    if( !item ) {
+                        Object.filter = (obj, predicate) => Object.keys(obj).filter( key => predicate(obj[key]) ).reduce( (res, key) => (res[key] = obj[key], res), {} );
+                        $(this).find('.swatch-attribute').each(function() {
+                            products = Object.filter(products, p => p[$(this).attr('attribute-id')] == $(this).attr('option-selected'))
+                        });
+
+                        item = Object.keys(products)[0];
+                    }
+
                     fbq('track', 'AddToCart', {
-                        content_ids: ['stsp_%s'],
+                        content_ids: [products[item]['id']],
                         content_type: 'product',
-                        value: val,
+                        value: products[item]['price'] * qty,
                         currency: '%s'
                     });
                 })
-            })
+            })", json_encode( $options ), $this->getCurrency());
+        }
 
-        ",
-            $p1,
-            $this->productsHelper->getProductPrice($product),
-            $product->getId(),
-            $this->getCurrency()
-        );
+        else {
+            $add_to_cart = sprintf("
+                require(['jquery'], function($){
+                    $('#product_addtocart_form').submit(function() {
+                        const qty = $(this).find('input[name=\"qty\"]').val();
+                        fbq('track', 'AddToCart', {
+                            content_ids: ['stsp_%s'],
+                            content_type: 'product',
+                            value: %s * qty,
+                            currency: '%s'
+                        });
+                    })
+                })", $product_id, $product_price, $this->getCurrency());
+        }
+
+        $view_content = $this->facebookEventCode('ViewContent', [
+            'content_type'  => $type,
+            'content_ids'   => json_encode([$this->getContentId($product_id)]),
+            'value'         => $product_price,
+            'currency'      => $this->getCurrency()
+        ]);
+
+
+        return sprintf("%s\n%s", $view_content, $add_to_cart);
     }
 
     /**
@@ -183,62 +236,141 @@ class Display extends \Magento\Framework\View\Element\Template
      * Render add to cart event in form mode
      * @return string
      */
-    private function renderAddToCartFormEvent()
+    private function renderCategoryEvent()
     {
-        $category = $this->catalogHelper->getCategory();
-        $products = $category->getProductCollection()->addFinalPrice();
-        $product_list = [];
+        $products = $this->getLayout()
+            ->getBlock('category.products.list')
+            ->getLoadedProductCollection()
+            ->addFinalPrice();
+
+        $option_list = [];
         foreach ($products as $product) {
-            $id = $product->getId();
-            $type = $product->getTypeId() == 'configurable' ? 'product_group' : 'product';
-            $product_list[$id] = [
-                'value'         => $this->productsHelper->getProductPrice($product),
-                'content_type'  => $type,
-                'content_ids'   => [$this->getContentId($product->getId())],
-                'currency'      => $this->getCurrency()
-            ];
+            if($product->getTypeId() == 'configurable') {
+                $add = $this->getProductVariations($product);
+            } else {
+                $add = [
+                    'price' => $this->productsHelper->getProductPrice($product)
+                ];
+            }
+            $option_list[$product->getId()] = $add;
         }
+
         return sprintf("
 
-            require(['jquery'], function($){
-                $('form[data-role=\"tocart-form\"]').submit(function() {
-                    const products = %s;
-                    const product = products[$(this).children('input[name=\"product\"]').val()];
-                    if( product && product.content_type === 'product' ) {
-                        fbq('track', 'AddToCart', product)
+            require(['jquery'], function($) {
+                'use strict';
+                $('form[data-role=\"tocart-form\"]').submit(function () {
+                    var products = %s;
+                    var parent = $(this).find('input[name=\"product\"]').val();
+                    var options = $('[data-role=\"swatch-option-' + parent + '\"]');
+                    if ( options.length ) {
+                        Object.filter = (obj, predicate) => Object.keys(obj).filter( key => predicate(obj[key]) ).reduce( (res, key) => (res[key] = obj[key], res), {} );
+                        var swatch = products[parent];
+                        options.children().each(function () {
+                            swatch = Object.filter(swatch, p => p[$(this).attr('attribute-id')] == $(this).attr('option-selected'));
+                        });
+                        var oKey = Object.keys(swatch)[0];
+                        products[oKey]= {price: swatch[oKey]['price']};
+                        parent = oKey;
                     }
-                })
-            })
+                    fbq('track', 'AddToCart', {
+                        content_ids: ['stsp_' + parent],
+                        content_type: 'product',
+                        value: products[parent]['price'],
+                        currency: '%s'
+                    });
+                });
+            });
 
-        ", json_encode($product_list));
+        ", json_encode($option_list), $this->getCurrency());
+
+        // LEGACY
+        // $mode = $this->getRequest()->getParam('product_list_mode') ? $this->getRequest()->getParam('product_list_mode') : $this->listHelper->getDefaultViewMode();
+        // $sort = $this->getRequest()->getParam('product_list_dir') ? $this->getRequest()->getParam('product_list_dir') : $this->listHelper::DEFAULT_SORT_DIRECTION;
+        // $page = $this->getRequest()->getParam('p') ? $this->getRequest()->getParam('p') : 1;
+        // $size = $this->getRequest()->getParam('product_list_limit') ? $this->getRequest()->getParam('product_list_limit') : $this->listHelper->getDefaultLimitPerPageValue($mode);
+        // $order = $this->getRequest()->getParam('product_list_order') ? $this->getRequest()->getParam('product_list_order') : $this->listHelper->getDefaultSortField();
+        //
+        // $category = $this->catalogHelper->getCategory();
+        // $products = $category->getProductCollection()->setPageSize($size)->setCurPage($page)->addFinalPrice()->setOrder($order, $sort);
+        // $product_list = [];
+        // $currency = $this->getCurrency();
+        //
+        // foreach ($products as $product) {
+        //     $product_id = $product->getId();
+        //     $product_type = $product->getTypeId();
+        //     $type = 'product';
+        //     if( $product_type == 'configurable' ) {
+        //         $type = 'product_group';
+        //         $options = $this->getProductVariations( $product );
+        //
+        //         foreach( $options as $id => $option ) {
+        //             $product_list[$id] = [
+        //                 'value'         => $option['price'],
+        //                 'content_type'  => 'product',
+        //                 'content_ids'   => $option['id'],
+        //                 'currency'      => $currency,
+        //                 'option'        => $option,
+        //             ];
+        //         }
+        //     }
+        //
+        //     $product_list[$product_id] = [
+        //         'value'         => $this->productsHelper->getProductPrice($product),
+        //         'content_type'  => $type,
+        //         'content_ids'   => [$this->getContentId($product->getId())],
+        //         'currency'      => $currency
+        //     ];
+        // }
+        // return sprintf("
+        //
+        //     require(['jquery'], function($) {
+        //         'use strict';
+        //         $('form[data-role=\"tocart-form\"]').submit(function () {
+        //             var products = %s;
+        //             var product = $(this).find('input[name=\"product\"]').val();
+        //             if (products[product] && products[product].content_type === 'product_group') {
+        //                 var item = $(this).find('input[name=\"selected_configurable_option\"]').val();
+        //                 if (item) {
+        //                     product = item;
+        //                 } else {
+        //                     Object.filter = (obj, predicate) => Object.keys(obj).filter( key => predicate(obj[key]) ).reduce( (res, key) => (res[key] = obj[key], res), {} );
+        //                     $('.swatch-opt-' + product).find('.swatch-attribute').each(function() {
+        //                         products = Object.filter(products, p => p.option && p.option[$(this).attr('attribute-id')] == $(this).attr('option-selected'));
+        //                     });
+        //                     product = Object.keys(products)[0];
+        //                     delete products[product].option;
+        //                 }
+        //             }
+        //             fbq('track', 'AddToCart', products[product]);
+        //         });
+        //     })
+        //
+        // ", json_encode($product_list));
     }
 
     /**
      * Render add to cart event in button mode
      * @return string
      */
-    public function renderAddToCartButtonEvent()
+    public function RenderPageEvent()
     {
         return sprintf("
 
             require(['jquery'], function($){
-                try {
-                    $('button.tocart[data-post]').click(function() {
-                        const product = JSON.parse($(this).attr('data-post')).data.product
-                        const priceBox = $('[data-role=\"priceBox\"][data-product-id=\"' + product + '\"]');
-                        const price = priceBox.find('[data-price-amount]').attr('data-price-amount')
-                        fbq('track', 'AddToCart', {
-                            content_ids: ['stsp_' + product],
-                            content_type: 'product',
-                            value: price,
-                            currency: '%s'
-                        });
-                    })
-                }
-                catch(e) {
-                    return;
-                }
-            })
+                $('form[data-role=\"tocart-form\"]').submit(function () {
+                    var product = $(this).find('input[name=\"product\"]').val();
+                    var price = $('[data-role=\"priceBox\"][data-product-id=\"' + product + '\"]').find(
+                        '[data-price-amount]'
+                    ).attr('data-price-amount');
+                    fbq('track', 'AddToCart', {
+                        content_ids: ['stsp_' + product],
+                        content_type: 'product',
+                        value: price,
+                        currency: '%s'
+                    });
+                });
+            });
 
         ", $this->getCurrency());
     }
@@ -271,10 +403,10 @@ class Display extends \Magento\Framework\View\Element\Template
                 return $this->facebookEventCode('Search', $params);
 
             case 'catalog_category_view':
-                return $this->renderAddToCartFormEvent();
+                return $this->renderCategoryEvent();
 
             default:
-                return null;
+                return $this->RenderPageEvent();
         }
     }
 }

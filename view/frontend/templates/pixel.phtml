@@ -13,7 +13,6 @@ document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '<?= $block->escapeHtml($pixel) ?>');
 fbq('track', 'PageView');
 <?= $block->getEventCode() ?>
-<?= $block->renderAddToCartButtonEvent() ?>
 </script>
 
 <noscript>
