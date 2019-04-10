@@ -2,7 +2,7 @@
   "name": "storespot/personalization",
   "description": "The StoreSpot personalization integration.",
   "type": "magento2-module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "require": {
     "ext-json": "*"
