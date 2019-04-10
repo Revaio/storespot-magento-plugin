@@ -28,7 +28,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Api\Search\FilterGroup $filterGroup,
         \Magento\Framework\Api\FilterBuilder $filterBuilder,
         \Magento\Catalog\Model\Product\Attribute\Source\Status $productStatus,
-        \Magento\CatalogInventory\Model\Stock\StockitemRepository $stockItemRepository,
+        \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository,
         \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableProductType,
         \Magento\Catalog\Helper\Data $catalogHelper,
         \Magento\Tax\Model\Config $taxConfig
